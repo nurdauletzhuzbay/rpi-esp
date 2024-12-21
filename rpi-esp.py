@@ -13,7 +13,7 @@ try:
     esp32_serial = serial.Serial(ESP32_PORT, BAUD_RATE_ESP, timeout=TIMEOUT)
     # nano_serial = serial.Serial(ARDUINO_PORT, BAUD_RATE_NANO, timeout=TIMEOUT)
     print(f"Connected to ESP32 on {ESP32_PORT}")
-    # print(f"Connected to NANO on {ARDUINO_PORT}")
+    print(f"Connected to NANO on {ARDUINO_PORT}")
 except Exception as e:
     print(f"Error initializing serial port: {e}")
     exit()
@@ -24,6 +24,16 @@ current_pos_y = 0.0
 current_pos_z = 0.0
     
     
+# def send_nano_command(command):
+#     try:
+#         if nano_serial.is_open:
+#             nano_serial.write((command + '\n').encode('utf-8'))
+#             print(f"Sent command to Nano: {command}")
+#         else:
+#             print("Nano serial port is not open.")
+#     except Exception as e:
+#         print(f"Error sending command to Nano: {e}")
+        
 # Function to send a movement command
 def send_movement_command(direction, distance):
     global current_pos_x, current_pos_y, current_pos_z
@@ -98,7 +108,6 @@ def read_esp32_data(esp32_serial):
     """
     try:
         if esp32_serial.in_waiting > 0:
-            # Read a single line of data
             response = esp32_serial.readline().decode('utf-8', errors='ignore').strip()
             if response:
                 # print(f"Raw data received: {response}")  # Debug raw data
@@ -182,6 +191,10 @@ def interactive_control():
         print("Commands:")
         print("  move <direction> <distance> - Move robot (forward, backward, left, right, up, down)")
         print("  chassis <mode> - Change chassis mode (stable, x, y)")
+        print("  grasp - Close the gripper")
+        print("  release - Open the gripper")
+        print("  fix - Fix the gripper position")
+        print("  unfix - Unfix the gripper position")
         print("  exit - Exit the program")
 
         while True:
@@ -214,23 +227,26 @@ def interactive_control():
                 else:
                     print("Invalid format. Use: chassis <mode>")
 
+            # elif command in ["grasp", "release", "fix", "unfix"]:
+            #     send_nano_command(command)
+
             elif command == "exit":
                 print("Exiting program...")
                 break
 
             else:
-                print("Invalid command. Use move, chassis, or exit.")
-
+                print("Invalid command. Use move, chassis, grasp, release, fix, unfix, or exit.")
 
     except KeyboardInterrupt:
         print("\nExiting program...")
     finally:
         esp32_serial.close()
-        print("Serial port closed.")
+        # nano_serial.close()
+        print("Serial ports closed.")
 
 if __name__ == "__main__":
-    # interactive_control()
-    while True:
-        data = read_esp32_data(esp32_serial)
+    interactive_control()
+    # while True:
+    #     data = read_esp32_data(esp32_serial)
         # if data is not None:
             # print(f"Parsed data: {data}")
