@@ -1,6 +1,5 @@
 import serial
 import time
-import threading
 
 # Serial port settings
 ESP32_PORT = '/dev/ttyUSB1'
@@ -23,7 +22,7 @@ except Exception as e:
 current_pos_x = 0.0
 current_pos_y = 0.0
 current_pos_z = 0.0
-report_lift_position = True   
+    
     
 def send_nano_command(command):
     try:
@@ -42,22 +41,22 @@ def send_movement_command(direction, distance):
 
     if direction == "forward":
         target_pos_x = current_pos_x + distance
-        cmd = f"AK80,{target_pos_x:.4f},{current_pos_y:.4f}"
+        cmd = f"AK80,{target_pos_x:.4f},{current_pos_y:.4f},{current_pos_z:.4f}"
     elif direction == "backward":
         target_pos_x = current_pos_x - distance
-        cmd = f"AK80,{target_pos_x:.4f},{current_pos_y:.4f}"
+        cmd = f"AK80,{target_pos_x:.4f},{current_pos_y:.4f},{current_pos_z:.4f}"
     elif direction == "left":
         target_pos_y = current_pos_y + distance
-        cmd = f"AK80,{current_pos_x:.4f},{target_pos_y:.4f}"
+        cmd = f"AK80,{current_pos_x:.4f},{target_pos_y:.4f},{current_pos_z:.4f}"
     elif direction == "right":
         target_pos_y = current_pos_y - distance
-        cmd = f"AK80,{current_pos_x:.4f},{target_pos_y:.4f}"
+        cmd = f"AK80,{current_pos_x:.4f},{target_pos_y:.4f},{current_pos_z:.4f}"
     elif direction == "up":
         target_pos_z = current_pos_z + distance
-        cmd = f"LIFT,{target_pos_z:.4f}"
+        cmd = f"AK80,{current_pos_x:.4f},{current_pos_y:.4f},{target_pos_z:.4f}"
     elif direction == "down":
         target_pos_z = current_pos_z - distance
-        cmd = f"LIFT,{target_pos_z:.4f}"
+        cmd = f"AK80,{current_pos_x:.4f},{current_pos_y:.4f},{target_pos_z:.4f}"
 
     # Send the command to ESP32
     if cmd:
@@ -146,22 +145,10 @@ def parse_esp32_data(response):
         print(f"Error parsing ESP32 data: {e}")
     return None
 
-# Function to report the current position of LIFT periodically
-def report_lift_position_periodically():
-    global report_lift_position, current_pos_z
-    while report_lift_position:
-        try:
-            # print(f"LIFT Current Position: z={current_pos_z:.4f}")
-            esp32_serial.write(f"LIFT_POSITION,{current_pos_z:.4f}\n".encode())
-        except Exception as e:
-            print(f"Error reporting LIFT position: {e}")
-        time.sleep(0.1)
-
 
 # Function to wait for the distance to be reached
 def wait_until_target_reached(direction, distance):
-    global current_pos_x, current_pos_y, current_pos_z, report_lift_position
-
+    global current_pos_x, current_pos_y, current_pos_z
     target_reached = False
     target_pos_x = current_pos_x
     target_pos_y = current_pos_y
@@ -178,6 +165,7 @@ def wait_until_target_reached(direction, distance):
         data = read_esp32_data()
         if data:
             pos_x, pos_y, pos_z = data
+            # Check if the target position is reached
             if (abs(pos_x - target_pos_x) < 0.0003 and
                 abs(pos_y - target_pos_y) < 0.0003 and
                 abs(pos_z - target_pos_z) < 0.0003):
@@ -186,12 +174,10 @@ def wait_until_target_reached(direction, distance):
                 current_pos_y = pos_y
                 current_pos_z = pos_z
                 target_reached = True
-        time.sleep(0.1)
-
-
-# Start periodic reporting of LIFT position in a separate thread
-lift_report_thread = threading.Thread(target=report_lift_position_periodically, daemon=True)
-lift_report_thread.start()
+            else:
+                print(f"Waiting for target... Current: x={pos_x:.4f}, y={pos_y:.4f}, z={pos_z:.4f}")
+                send_movement_command(direction, distance)
+        time.sleep(0.1) 
 
 # Interactive control loop
 def interactive_control():
@@ -217,7 +203,7 @@ def interactive_control():
                         distance = float(parts[2])
                         if direction in ["forward", "backward", "left", "right", "up", "down"]:
                             send_movement_command(direction, distance)
-                            wait_until_target_reached(direction, distance)
+                            # wait_until_target_reached(direction, distance)
                         else:
                             print("Invalid direction. Use forward, backward, left, right, up, or down.")
                     except ValueError:
@@ -241,10 +227,6 @@ def interactive_control():
 
             elif command == "exit":
                 print("Exiting program...")
-                print("Exiting program...")
-                global report_lift_position
-                report_lift_position = False
-
                 break
 
             else:
