@@ -241,7 +241,4 @@ def interactive_control():
 
 if __name__ == "__main__":
     interactive_control()
-    # while True:
-    #     data = read_esp32_data(esp32_serial)
-        # if data is not None:
-            # print(f"Parsed data: {data}")
+
