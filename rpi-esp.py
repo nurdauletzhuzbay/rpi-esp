@@ -23,7 +23,7 @@ except Exception as e:
 current_pos_x = 0.0
 current_pos_y = 0.0
 current_pos_z = 0.0
-    
+report_lift_position = True   
     
 def send_nano_command(command):
     try:
