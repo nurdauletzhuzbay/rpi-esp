@@ -127,15 +127,10 @@ def parse_esp32_data(response):
             parts = response[5:].split(',')
 
             if len(parts) == 9:  # Ensure exactly 9 parts are present
-                # Extract positions (x, y, z)
-                pos_x = float(parts[0].strip())
-                pos_y = float(parts[3].strip())
-                pos_z = float(parts[6].strip())
-
-                # Ensure 4 decimal points in the output
-                pos_x = f"{pos_x:.4f}"
-                pos_y = f"{pos_y:.4f}"
-                pos_z = f"{pos_z:.4f}"
+                # Extract positions (x, y, z) and round them to 4 decimal points
+                pos_x = round(float(parts[0].strip()), 4)
+                pos_y = round(float(parts[3].strip()), 4)
+                pos_z = round(float(parts[6].strip()), 4)
 
                 # Debug output
                 # print(f"Parsed Data - pos_x: {pos_x}, pos_y: {pos_y}, pos_z: {pos_z}")
@@ -148,7 +143,6 @@ def parse_esp32_data(response):
     except Exception as e:
         print(f"Error parsing ESP32 data: {e}")
     return None
-
 
 
 # Function to wait for the distance to be reached
