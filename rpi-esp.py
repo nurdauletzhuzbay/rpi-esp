@@ -96,7 +96,7 @@ def change_chassis(chassis_command, esp32_serial):
     print("Chassis change completed.")
 
 
-def read_esp32_data(esp32_serial):
+def read_esp32_data():
     """
     Reads and parses a line of data from the ESP32 via serial communication.
 
