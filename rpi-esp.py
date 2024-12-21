@@ -165,9 +165,9 @@ def wait_until_target_reached(direction, distance):
         if data:
             pos_x, pos_y, pos_z = data
             # Check if the target position is reached
-            if (abs(pos_x - target_pos_x) < 0.001 and
-                abs(pos_y - target_pos_y) < 0.001 and
-                abs(pos_z - target_pos_z) < 0.001):
+            if (abs(pos_x - target_pos_x) < 0.0001 and
+                abs(pos_y - target_pos_y) < 0.0001 and
+                abs(pos_z - target_pos_z) < 0.0001):
                 print(f"Target reached: x={pos_x:.4f}, y={pos_y:.4f}, z={pos_z:.4f}")
                 current_pos_x = pos_x
                 current_pos_y = pos_y
