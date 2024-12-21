@@ -151,7 +151,7 @@ def report_lift_position_periodically():
     global report_lift_position, current_pos_z
     while report_lift_position:
         try:
-            print(f"LIFT Current Position: z={current_pos_z:.4f}")
+            # print(f"LIFT Current Position: z={current_pos_z:.4f}")
             esp32_serial.write(f"LIFT_POSITION,{current_pos_z:.4f}\n".encode())
         except Exception as e:
             print(f"Error reporting LIFT position: {e}")
