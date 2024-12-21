@@ -177,7 +177,7 @@ def wait_until_target_reached(direction, distance):
             else:
                 print(f"Waiting for target... Current: x={pos_x:.4f}, y={pos_y:.4f}, z={pos_z:.4f}")
                 send_movement_command(direction, distance)
-        time.sleep(1.0) 
+        time.sleep(0.5) 
 
 # Interactive control loop
 def interactive_control():
