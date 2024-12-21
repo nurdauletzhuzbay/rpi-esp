@@ -101,7 +101,7 @@ def read_esp32_data(esp32_serial):
             # Read a single line of data
             response = esp32_serial.readline().decode('utf-8', errors='ignore').strip()
             if response:
-                # print(f"Raw data received: {response}")  # Debug raw data
+                print(f"Raw data received: {response}")  # Debug raw data
                 return parse_esp32_data(response.strip())
     except serial.SerialException as e:
         print(f"Serial error: {e}")
@@ -129,7 +129,7 @@ def parse_esp32_data(response):
                 pos_z = f"{pos_z:.4f}"
 
                 # Debug output
-                # print(f"Parsed Data - pos_x: {pos_x}, pos_y: {pos_y}, pos_z: {pos_z}")
+                print(f"Parsed Data - pos_x: {pos_x}, pos_y: {pos_y}, pos_z: {pos_z}")
 
                 return pos_x, pos_y, pos_z
             else:
