@@ -1,5 +1,6 @@
 import serial
 import time
+import threading
 
 # Serial port settings
 ESP32_PORT = '/dev/ttyUSB1'
