@@ -136,9 +136,9 @@ def parse_esp32_data(response):
                 # print(f"Parsed Data - pos_x: {pos_x}, pos_y: {pos_y}, pos_z: {pos_z}")
 
                 return pos_x, pos_y, pos_z
-            else:
-                print(f"Unexpected number of data points: {len(parts)}")
-                return None
+            # else:
+            #     print(f"Unexpected number of data points: {len(parts)}")
+            #     return None
     except ValueError as e:
         print(f"Error converting data to float: {e}")
     except Exception as e:
