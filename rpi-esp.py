@@ -241,6 +241,10 @@ def interactive_control():
 
             elif command == "exit":
                 print("Exiting program...")
+                print("Exiting program...")
+                global report_lift_position
+                report_lift_position = False
+
                 break
 
             else:
