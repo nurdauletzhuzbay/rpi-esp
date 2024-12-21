@@ -13,7 +13,7 @@ try:
     esp32_serial = serial.Serial(ESP32_PORT, BAUD_RATE_ESP, timeout=TIMEOUT)
     # nano_serial = serial.Serial(ARDUINO_PORT, BAUD_RATE_NANO, timeout=TIMEOUT)
     print(f"Connected to ESP32 on {ESP32_PORT}")
-    print(f"Connected to NANO on {ARDUINO_PORT}")
+    # print(f"Connected to NANO on {ARDUINO_PORT}")
 except Exception as e:
     print(f"Error initializing serial port: {e}")
     exit()
@@ -138,6 +138,7 @@ def parse_esp32_data(response):
                 return pos_x, pos_y, pos_z
             else:
                 print(f"Unexpected number of data points: {len(parts)}")
+                return None
     except ValueError as e:
         print(f"Error converting data to float: {e}")
     except Exception as e:
