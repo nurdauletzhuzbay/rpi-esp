@@ -116,7 +116,7 @@ def parse_esp32_data(response):
                 pos_y = round(float(parts[3].strip()), 4)
                 pos_z = round(float(parts[6].strip()), 4)
 
-                # print(f"Parsed Data - pos_x: {pos_x}, pos_y: {pos_y}, pos_z: {pos_z}")
+                print(f"Parsed Data - pos_x: {pos_x}, pos_y: {pos_y}, pos_z: {pos_z}")
                 return pos_x, pos_y, pos_z
 
     except ValueError as e:
@@ -155,6 +155,10 @@ def interactive_control():
                         print("Invalid distance. Use a numeric value.")
                 else:
                     print("Invalid format. Use: move <direction> <distance>")
+                
+                for i in range(1000):
+                    time.sleep(10)
+                    read_esp32_data()
 
             elif command.startswith("chassis"):
                 parts = command.split()
