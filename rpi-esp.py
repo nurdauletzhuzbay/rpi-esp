@@ -38,8 +38,10 @@ def send_nano_command(command):
 def send_movement_command(direction, distance):
     global current_pos_x, current_pos_y, current_pos_z
     cmd = ""
-    data = read_esp32_data()
-    current_pos_x, current_pos_y, current_pos_z = data
+    pos_x, pos_y, pos_z = read_esp32_data()
+    current_pos_x = pos_x
+    current_pos_y = pos_y
+    current_pos_z = pos_z
     if direction == "forward":
         target_pos_x = current_pos_x + distance
         cmd = f"AK80,{target_pos_x:.4f},{current_pos_y:.4f},{current_pos_z:.4f}"
