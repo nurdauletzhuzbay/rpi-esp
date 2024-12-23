@@ -24,6 +24,7 @@ current_pos_z = 0.0
 def initialize_positions():
     global current_pos_x, current_pos_y, current_pos_z
     i = 0
+    time.sleep(2)
     while i<5:
         
         initial_data = read_esp32_data()
