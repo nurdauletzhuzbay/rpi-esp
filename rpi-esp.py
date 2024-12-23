@@ -169,6 +169,7 @@ def wait_until_target_reached(direction, distance):
         data = read_esp32_data()
         if data:
             pos_x, pos_y, pos_z = data
+            # Check if the target position is reached
             if (abs(pos_x - target_pos_x) < 0.0001 and
                 abs(pos_y - target_pos_y) < 0.0001 and
                 abs(pos_z - target_pos_z) < 0.0001):
@@ -203,7 +204,7 @@ def interactive_control():
                         distance = float(parts[2])
                         if direction in ["forward", "backward", "left", "right", "up", "down"]:
                             send_movement_command(direction, distance)
-                            # wait_until_target_reached(direction, distance)
+                            wait_until_target_reached(direction, distance)
                         else:
                             print("Invalid direction. Use forward, backward, left, right, up, or down.")
                     except ValueError:
