@@ -247,4 +247,5 @@ if __name__ == "__main__":
     data = read_esp32_data()
     if data:
         current_pos_x, current_pos_y, current_pos_z = data
+        print(current_pos_x, current_pos_y, current_pos_z)
 
