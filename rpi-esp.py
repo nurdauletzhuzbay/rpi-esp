@@ -34,7 +34,7 @@ def send_nano_command(command):
 # Function to send a movement command
 def send_movement_command(direction, distance):
     global current_pos_x, current_pos_y, current_pos_z
-
+    distance = distance/1000
     cmd = ""
     if direction == "forward":
         current_pos_x += distance
