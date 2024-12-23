@@ -1,14 +1,12 @@
 import serial
 import time
 
-# Serial port settings
-ESP32_PORT = '/dev/ttyUSB1'
-ARDUINO_PORT = '/dev/ttyUSB0'
+ESP32_PORT = '/dev/ttyUSB0'
+ARDUINO_PORT = '/dev/ttyUSB1'
 BAUD_RATE_ESP = 38400
 BAUD_RATE_NANO = 9600
 TIMEOUT = 1
 
-# Initialize serial connection
 try:
     esp32_serial = serial.Serial(ESP32_PORT, BAUD_RATE_ESP, timeout=TIMEOUT)
     nano_serial = serial.Serial(ARDUINO_PORT, BAUD_RATE_NANO, timeout=TIMEOUT)
@@ -36,45 +34,40 @@ def send_nano_command(command):
 # Function to send a movement command
 def send_movement_command(direction, distance):
     global current_pos_x, current_pos_y, current_pos_z
+
     cmd = ""
-
-        
     if direction == "forward":
-        target_pos_x = current_pos_x + distance
-        cmd = f"MOVX,{target_pos_x:.4f}"
+        current_pos_x += distance
+        cmd = f"MOVX,{current_pos_x:.4f}"
     elif direction == "backward":
-        target_pos_x = current_pos_x - distance
-        cmd = f"MOVX,{target_pos_x:.4f}"
-    elif direction == "left":
-        target_pos_y = current_pos_y + distance
-        cmd = f"MOVY,{target_pos_y:.4f}"
-    elif direction == "right":
-        target_pos_y = current_pos_y - distance
-        cmd = f"MOVY,{target_pos_y:.4f}"
-    elif direction == "up":
-        target_pos_z = current_pos_z + distance
-        cmd = f"LIFT,{target_pos_z:.4f}"
-    elif direction == "down":
-        target_pos_z = current_pos_z - distance
-        cmd = f"LIFT,{target_pos_z:.4f}"
+        current_pos_x -= distance
+        cmd = f"MOVX,{current_pos_x:.4f}"
 
-    # Send the command to ESP32
+    elif direction == "left":
+        current_pos_y += distance
+        cmd = f"MOVY,{current_pos_y:.4f}"
+
+    elif direction == "right":
+        current_pos_y -= distance
+        cmd = f"MOVY,{current_pos_y:.4f}"
+
+    elif direction == "up":
+        current_pos_z += distance
+        cmd = f"LIFT,{current_pos_z:.4f}"
+
+    elif direction == "down":
+        current_pos_z -= distance
+        cmd = f"LIFT,{current_pos_z:.4f}"
+
     if cmd:
         try:
             esp32_serial.write((cmd + '\n').encode())
             print(f"Sent to ESP32: {cmd}")
-                
         except Exception as e:
             print(f"Error sending to ESP32: {e}")
 
 def change_chassis(chassis_command, esp32_serial):
-    """
-    Changes the chassis state of the robot.
-    
-    Args:
-        chassis_command (str): The chassis command to send. Should be one of "stable", "x", or "y".
-        esp_serial (serial.Serial): Serial connection to the ESP32.
-    """
+
     # Map chassis command to the corresponding POLO command
     chassis_map = {
         "stable": "POLO,0",
@@ -98,15 +91,7 @@ def change_chassis(chassis_command, esp32_serial):
 
 
 def read_esp32_data():
-    """
-    Reads and parses a line of data from the ESP32 via serial communication.
 
-    Args:
-        esp32_serial (serial.Serial): A pre-initialized serial connection to the ESP32.
-    
-    Returns:
-        str: The raw line of data received from the ESP32, or None if no valid data is received.
-    """
     try:
         if esp32_serial.in_waiting > 0:
             response = esp32_serial.readline().decode('utf-8', errors='ignore').strip()
@@ -141,35 +126,6 @@ def parse_esp32_data(response):
     return None
 
 
-def wait_until_target_reached(direction, distance):
-    global current_pos_x, current_pos_y, current_pos_z
-    target_reached = False
-    target_pos_x = current_pos_x
-    target_pos_y = current_pos_y
-    target_pos_z = current_pos_z
-
-    if direction in ["forward", "backward"]:
-        target_pos_x += distance if direction == "forward" else -distance
-    elif direction in ["left", "right"]:
-        target_pos_y += distance if direction == "left" else -distance
-    elif direction in ["up", "down"]:
-        target_pos_z += distance if direction == "up" else -distance
-
-    while not target_reached:
-        data = read_esp32_data()
-        if data:
-            pos_x, pos_y, pos_z = data
-            # Check if the target position is reached
-            if (abs(pos_x - target_pos_x) < 0.0003 and
-                abs(pos_y - target_pos_y) < 0.0003 and
-                abs(pos_z - target_pos_z) < 0.0003):
-                print(f"Target reached: x={pos_x:.4f}, y={pos_y:.4f}, z={pos_z:.4f}")
-                current_pos_x = pos_x
-                current_pos_y = pos_y
-                current_pos_z = pos_z
-                target_reached = True
-        time.sleep(0.1) 
-
 def interactive_control():
     try:
         print("\nInteractive Robot Control")
@@ -193,7 +149,6 @@ def interactive_control():
                         distance = float(parts[2])
                         if direction in ["forward", "backward", "left", "right", "up", "down"]:
                             send_movement_command(direction, distance)
-                            # wait_until_target_reached(direction, distance)
                         else:
                             print("Invalid direction. Use forward, backward, left, right, up, or down.")
                     except ValueError:
@@ -226,7 +181,7 @@ def interactive_control():
         print("\nExiting program...")
     finally:
         esp32_serial.close()
-        # nano_serial.close()
+        nano_serial.close()
         print("Serial ports closed.")
 
 if __name__ == "__main__":
