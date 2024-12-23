@@ -38,10 +38,7 @@ def send_nano_command(command):
 def send_movement_command(direction, distance):
     global current_pos_x, current_pos_y, current_pos_z
     cmd = ""
-    data = read_esp32_data()
-    if data:
-        current_pos_x, current_pos_y, current_pos_z = data
-        print(current_pos_x, current_pos_y, current_pos_z)
+
         
     if direction == "forward":
         target_pos_x = current_pos_x + distance
@@ -172,18 +169,14 @@ def wait_until_target_reached(direction, distance):
         data = read_esp32_data()
         if data:
             pos_x, pos_y, pos_z = data
-            # Check if the target position is reached
-            if (abs(pos_x - target_pos_x) < 0.0003 and
-                abs(pos_y - target_pos_y) < 0.0003 and
-                abs(pos_z - target_pos_z) < 0.0003):
+            if (abs(pos_x - target_pos_x) < 0.0001 and
+                abs(pos_y - target_pos_y) < 0.0001 and
+                abs(pos_z - target_pos_z) < 0.0001):
                 print(f"Target reached: x={pos_x:.4f}, y={pos_y:.4f}, z={pos_z:.4f}")
                 current_pos_x = pos_x
                 current_pos_y = pos_y
                 current_pos_z = pos_z
                 target_reached = True
-            else:
-                print(f"Waiting for target... Current: x={pos_x:.4f}, y={pos_y:.4f}, z={pos_z:.4f}")
-                send_movement_command(direction, distance)
         time.sleep(0.1) 
 
 # Interactive control loop
