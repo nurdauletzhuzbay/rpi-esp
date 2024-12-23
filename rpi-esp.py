@@ -1,8 +1,8 @@
 import serial
 import time
 
-ESP32_PORT = '/dev/ttyUSB1'
-ARDUINO_PORT = '/dev/ttyUSB0'
+ESP32_PORT = '/dev/ttyUSB2'
+ARDUINO_PORT = '/dev/ttyUSB3'
 BAUD_RATE_ESP = 38400
 BAUD_RATE_NANO = 9600
 TIMEOUT = 1
@@ -20,7 +20,20 @@ current_pos_x = 0.0
 current_pos_y = 0.0
 current_pos_z = 0.0
     
-    
+
+def initialize_positions():
+    global current_pos_x, current_pos_y, current_pos_z
+    i = 0
+    while i<5:
+        
+        initial_data = read_esp32_data()
+        if initial_data:
+            current_pos_x, current_pos_y, current_pos_z = initial_data
+            print(f"Initialized positions - X: {current_pos_x}, Y: {current_pos_y}, Z: {current_pos_z}")
+        else:
+            print("Failed to initialize positions. Using default values.")
+        i += 1
+        
 def send_nano_command(command):
     try:
         if nano_serial.is_open:
@@ -96,7 +109,7 @@ def read_esp32_data():
         if esp32_serial.in_waiting > 0:
             response = esp32_serial.readline().decode('utf-8', errors='ignore').strip()
             if response:
-                # print(f"Raw data received: {response}")  # Debug raw data
+                print(f"Raw data received: {response}")  # Debug raw data
                 return parse_esp32_data(response.strip())
     except serial.SerialException as e:
         print(f"Serial error: {e}")
@@ -134,8 +147,6 @@ def interactive_control():
         print("  chassis <mode> - Change chassis mode (stable, x, y)")
         print("  grasp - Close the gripper")
         print("  release - Open the gripper")
-        print("  fix - Fix the gripper position")
-        print("  unfix - Unfix the gripper position")
         print("  exit - Exit the program")
 
         while True:
@@ -156,9 +167,6 @@ def interactive_control():
                 else:
                     print("Invalid format. Use: move <direction> <distance>")
                 
-                # for i in range(1000):
-                #     time.sleep(10)
-                #     read_esp32_data()
 
             elif command.startswith("chassis"):
                 parts = command.split()
@@ -189,6 +197,7 @@ def interactive_control():
         print("Serial ports closed.")
 
 if __name__ == "__main__":
+    initialize_positions() 
     interactive_control()
 
 
