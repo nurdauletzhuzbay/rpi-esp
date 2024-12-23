@@ -156,9 +156,9 @@ def interactive_control():
                 else:
                     print("Invalid format. Use: move <direction> <distance>")
                 
-                for i in range(1000):
-                    time.sleep(10)
-                    read_esp32_data()
+                # for i in range(1000):
+                #     time.sleep(10)
+                #     read_esp32_data()
 
             elif command.startswith("chassis"):
                 parts = command.split()
