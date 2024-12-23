@@ -2,8 +2,8 @@ import serial
 import time
 
 # Serial port settings
-ESP32_PORT = '/dev/ttyUSB1'
-ARDUINO_PORT = '/dev/ttyUSB0'
+ESP32_PORT = '/dev/ttyUSB0'
+ARDUINO_PORT = '/dev/ttyUSB1'
 BAUD_RATE_ESP = 38400
 BAUD_RATE_NANO = 9600
 TIMEOUT = 1
@@ -18,7 +18,6 @@ except Exception as e:
     print(f"Error initializing serial port: {e}")
     exit()
 
-# Global positions
 current_pos_x = 0.0
 current_pos_y = 0.0
 current_pos_z = 0.0
@@ -64,8 +63,6 @@ def send_movement_command(direction, distance):
         try:
             esp32_serial.write((cmd + '\n').encode())
             print(f"Sent to ESP32: {cmd}")
-            
-
                 
         except Exception as e:
             print(f"Error sending to ESP32: {e}")
@@ -127,22 +124,16 @@ def read_esp32_data():
 def parse_esp32_data(response):
     try:
         if response.startswith("AK80"):
-            # Remove "AK80" and split the remaining data by commas
             parts = response[5:].split(',')
 
-            if len(parts) == 9:  # Ensure exactly 9 parts are present
-                # Extract positions (x, y, z) and round them to 4 decimal points
+            if len(parts) == 9:
                 pos_x = round(float(parts[0].strip()), 4)
                 pos_y = round(float(parts[3].strip()), 4)
                 pos_z = round(float(parts[6].strip()), 4)
 
-                # Debug output
                 # print(f"Parsed Data - pos_x: {pos_x}, pos_y: {pos_y}, pos_z: {pos_z}")
-
                 return pos_x, pos_y, pos_z
-            # else:
-            #     print(f"Unexpected number of data points: {len(parts)}")
-            #     return None
+
     except ValueError as e:
         print(f"Error converting data to float: {e}")
     except Exception as e:
@@ -150,9 +141,9 @@ def parse_esp32_data(response):
     return None
 
 
-# Function to wait for the distance to be reached
 def wait_until_target_reached(direction, distance):
     global current_pos_x, current_pos_y, current_pos_z
+    target_reached = False
     target_pos_x = current_pos_x
     target_pos_y = current_pos_y
     target_pos_z = current_pos_z
@@ -164,20 +155,21 @@ def wait_until_target_reached(direction, distance):
     elif direction in ["up", "down"]:
         target_pos_z += distance if direction == "up" else -distance
 
-    data = read_esp32_data()
-    if data:
-        pos_x, pos_y, pos_z = data
-        # Check if the target position is reached
-        if (abs(pos_x - target_pos_x) < 0.0003 and
-            abs(pos_y - target_pos_y) < 0.0003 and
-            abs(pos_z - target_pos_z) < 0.0003):
-            print(f"Target reached: x={pos_x:.4f}, y={pos_y:.4f}, z={pos_z:.4f}")
-            current_pos_x = pos_x
-            current_pos_y = pos_y
-            current_pos_z = pos_z
-        # time.sleep(0.1) 
+    while not target_reached:
+        data = read_esp32_data()
+        if data:
+            pos_x, pos_y, pos_z = data
+            # Check if the target position is reached
+            if (abs(pos_x - target_pos_x) < 0.0003 and
+                abs(pos_y - target_pos_y) < 0.0003 and
+                abs(pos_z - target_pos_z) < 0.0003):
+                print(f"Target reached: x={pos_x:.4f}, y={pos_y:.4f}, z={pos_z:.4f}")
+                current_pos_x = pos_x
+                current_pos_y = pos_y
+                current_pos_z = pos_z
+                target_reached = True
+        time.sleep(0.1) 
 
-# Interactive control loop
 def interactive_control():
     try:
         print("\nInteractive Robot Control")
