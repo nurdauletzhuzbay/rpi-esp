@@ -41,22 +41,22 @@ def send_movement_command(direction, distance):
         
     if direction == "forward":
         target_pos_x = current_pos_x + distance
-        cmd = f"AK80,{target_pos_x:.4f},{current_pos_y:.4f},{current_pos_z:.4f}"
+        cmd = f"MOVX,{target_pos_x:.4f}"
     elif direction == "backward":
         target_pos_x = current_pos_x - distance
-        cmd = f"AK80,{target_pos_x:.4f},{current_pos_y:.4f},{current_pos_z:.4f}"
+        cmd = f"MOVX,{target_pos_x:.4f}"
     elif direction == "left":
         target_pos_y = current_pos_y + distance
-        cmd = f"AK80,{current_pos_x:.4f},{target_pos_y:.4f},{current_pos_z:.4f}"
+        cmd = f"MOVY,{target_pos_y:.4f}"
     elif direction == "right":
         target_pos_y = current_pos_y - distance
-        cmd = f"AK80,{current_pos_x:.4f},{target_pos_y:.4f},{current_pos_z:.4f}"
+        cmd = f"MOVY,{target_pos_y:.4f}"
     elif direction == "up":
         target_pos_z = current_pos_z + distance
-        cmd = f"AK80,{current_pos_x:.4f},{current_pos_y:.4f},{target_pos_z:.4f}"
+        cmd = f"LIFT,{target_pos_z:.4f}"
     elif direction == "down":
         target_pos_z = current_pos_z - distance
-        cmd = f"AK80,{current_pos_x:.4f},{current_pos_y:.4f},{target_pos_z:.4f}"
+        cmd = f"LIFT,{target_pos_z:.4f}"
 
     # Send the command to ESP32
     if cmd:
@@ -193,7 +193,7 @@ def interactive_control():
                         distance = float(parts[2])
                         if direction in ["forward", "backward", "left", "right", "up", "down"]:
                             send_movement_command(direction, distance)
-                            wait_until_target_reached(direction, distance)
+                            # wait_until_target_reached(direction, distance)
                         else:
                             print("Invalid direction. Use forward, backward, left, right, up, or down.")
                     except ValueError:
