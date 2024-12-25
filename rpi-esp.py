@@ -159,7 +159,7 @@ def interactive_control():
                     direction = parts[1]
                     try:
                         distance = float(parts[2])
-                        if direction in ["forward", "backward", "left", "right", "up", "down"]:
+                        if direction in ["f", "b", "l", "r", "u", "d"]:
                             send_movement_command(direction, distance)
                         else:
                             print("Invalid direction. Use forward, backward, left, right, up, or down.")
