@@ -2,7 +2,7 @@ import serial
 import time
 
 ESP32_PORT = '/dev/ttyUSB0'
-ARDUINO_PORT = '/dev/ttyUSB2'
+ARDUINO_PORT = '/dev/ttyUSB1'
 BAUD_RATE_ESP = 38400
 BAUD_RATE_NANO = 9600
 TIMEOUT = 1
