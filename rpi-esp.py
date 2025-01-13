@@ -1,8 +1,8 @@
 import serial
 import time
 
-ESP32_PORT = '/dev/ttyUSB0'
-ARDUINO_PORT = '/dev/ttyUSB1'
+ESP32_PORT = '/dev/ttyUSB1'
+ARDUINO_PORT = '/dev/ttyUSB0'
 BAUD_RATE_ESP = 38400
 BAUD_RATE_NANO = 9600
 TIMEOUT = 1
@@ -16,10 +16,8 @@ except Exception as e:
     print(f"Error initializing serial port: {e}")
     exit()
 
-current_pos_x = 0.0
-current_pos_y = 0.0
-current_pos_z = 0.0
-    
+
+
 
 def initialize_positions():
     global current_pos_x, current_pos_y, current_pos_z
@@ -34,6 +32,8 @@ def initialize_positions():
         else:
             print("Failed to initialize positions. Using default values.")
         i += 1
+    
+    return current_pos_x, current_pos_y, current_pos_z
         
 def send_nano_command(command):
     try:
@@ -198,7 +198,9 @@ def interactive_control():
         print("Serial ports closed.")
 
 if __name__ == "__main__":
+    current_pos_x = 0.0
+    current_pos_y = 0.0
+    current_pos_z = 0.0
+
     initialize_positions() 
     interactive_control()
-
-
