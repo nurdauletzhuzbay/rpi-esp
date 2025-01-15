@@ -1,8 +1,9 @@
 import serial
 import time
+import re
 
-ESP32_PORT = '/dev/ttyUSB0'
-ARDUINO_PORT = '/dev/ttyUSB1'
+ESP32_PORT = '/dev/ttyUSB1'
+ARDUINO_PORT = '/dev/ttyUSB0'
 BAUD_RATE_ESP = 38400
 BAUD_RATE_NANO = 9600
 TIMEOUT = 1
@@ -48,7 +49,12 @@ def send_nano_command(command):
 # Function to send a movement command
 def send_movement_command(direction, distance):
     global current_pos_x, current_pos_y, current_pos_z
-    # distance = distance/1000
+    # distance = distance/1000        
+    latest_data = read_esp32_data()
+    if latest_data:
+        current_pos_x, current_pos_y, current_pos_z = latest_data
+
+        
     cmd = ""
     if direction == "forward":
         current_pos_x += distance
@@ -93,12 +99,10 @@ def change_chassis(chassis_command, esp32_serial):
         print(f"Invalid chassis command: {chassis_command}")
         return
 
-    # Send the chassis command to the ESP32
     command = chassis_map[chassis_command]
     esp32_serial.write((command + '\n').encode())
     print(f"Sent chassis command: {command}")
 
-    # Wait for 1.5 seconds to allow the chassis change to complete
     print("Waiting for chassis change to complete...")
     time.sleep(1.5)
     print("Chassis change completed.")
@@ -107,11 +111,15 @@ def change_chassis(chassis_command, esp32_serial):
 def read_esp32_data():
 
     try:
-        if esp32_serial.in_waiting > 0:
-            response = esp32_serial.readline().decode('utf-8', errors='ignore').strip()
-            if response:
-                print(f"Raw data received: {response}")  # Debug raw data
-                return parse_esp32_data(response.strip())
+        esp32_serial.reset_input_buffer()
+        time.sleep(0.1)
+        bad_line = esp32_serial.readline().decode('utf-8').strip()
+        print("before")
+        print(bad_line)
+        response = esp32_serial.readline().decode('utf-8').strip()
+        print("after")
+        print(response)
+        return parse_esp32_data(response)
     except serial.SerialException as e:
         print(f"Serial error: {e}")
     except Exception as e:
@@ -152,6 +160,8 @@ def interactive_control():
 
         while True:
             command = input("\nEnter command: ").strip().lower()
+            read_esp32_data()
+
 
             if command.startswith("move"):
                 parts = command.split()
@@ -194,7 +204,7 @@ def interactive_control():
         print("\nExiting program...")
     finally:
         esp32_serial.close()
-        # nano_serial.close()
+        nano_serial.close()
         print("Serial ports closed.")
 
 if __name__ == "__main__":
