@@ -2,8 +2,8 @@ import serial
 import time
 import re
 
-ESP32_PORT = '/dev/ttyUSB2'
-ARDUINO_PORT = '/dev/ttyUSB0'
+ESP32_PORT = '/dev/ttyUSB0'
+ARDUINO_PORT = '/dev/ttyUSB1'
 BAUD_RATE_ESP = 38400
 BAUD_RATE_NANO = 9600
 TIMEOUT = 1
@@ -109,36 +109,48 @@ def change_chassis(chassis_command, esp32_serial):
 
 
 def read_esp32_data():
-
     try:
-        esp32_serial.reset_input_buffer()
-        time.sleep(0.1)
-        bad_line = esp32_serial.readline().decode('utf-8').strip()
-        # print("before")
-        # print(bad_line)
-        response = esp32_serial.readline().decode('utf-8').strip()
-        # print("after")
-        # print(response)
+        buffer = ""
+        start_time = time.time()
+        esp32_serial.flushInput()
+
+        # Read until a full line is received or timeout
+        while True:
+            if esp32_serial.in_waiting > 0:
+                byte = esp32_serial.read(1).decode('utf-8')
+                buffer += byte
+                if byte == '\n':  # End of line
+                    break
+            
+            # Timeout if no data for 1 second
+            if time.time() - start_time > TIMEOUT:
+                print("Timeout while waiting for data from ESP32.")
+                return None
+
+        response = buffer.strip()
+        print(f"Raw ESP32 Data: {response}")
         return parse_esp32_data(response)
+
     except serial.SerialException as e:
         print(f"Serial error: {e}")
+    except UnicodeDecodeError as e:
+        print(f"Decoding error: {e}")
     except Exception as e:
         print(f"Unexpected error: {e}")
     return None
-
-
 
 def parse_esp32_data(response):
     try:
         if response.startswith("AK80"):
             parts = response[5:].split(',')
 
-            if len(parts) == 9:
+            if len(parts) == 4:  # Expecting 4 parts now (3 positions and the flag)
                 pos_x = round(float(parts[0].strip()), 4)
-                pos_y = round(float(parts[3].strip()), 4)
-                pos_z = round(float(parts[6].strip()), 4)
+                pos_y = round(float(parts[1].strip()), 4)
+                pos_z = round(float(parts[2].strip()), 4)
+                stopped_by_sensor = int(parts[3].strip())  # Parse the flag as an integer
 
-                print(f"Parsed Data - pos_x: {pos_x}, pos_y: {pos_y}, pos_z: {pos_z}")
+                print(f"Parsed Data - pos_x: {pos_x}, pos_y: {pos_y}, pos_z: {pos_z}, stopped_by_sensor: {stopped_by_sensor}")
                 return pos_x, pos_y, pos_z
 
     except ValueError as e:
@@ -146,6 +158,27 @@ def parse_esp32_data(response):
     except Exception as e:
         print(f"Error parsing ESP32 data: {e}")
     return None
+
+
+
+# def parse_esp32_data(response):
+#     try:
+#         if response.startswith("AK80"):
+#             parts = response[5:].split(',')
+
+#             if len(parts) == 9:
+#                 pos_x = round(float(parts[0].strip()), 4)
+#                 pos_y = round(float(parts[3].strip()), 4)
+#                 pos_z = round(float(parts[6].strip()), 4)
+
+#                 print(f"Parsed Data - pos_x: {pos_x}, pos_y: {pos_y}, pos_z: {pos_z}")
+#                 return pos_x, pos_y, pos_z
+
+#     except ValueError as e:
+#         print(f"Error converting data to float: {e}")
+#     except Exception as e:
+#         print(f"Error parsing ESP32 data: {e}")
+#     return None
 
 
 def interactive_control():
