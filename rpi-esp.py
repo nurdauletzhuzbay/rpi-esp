@@ -42,10 +42,10 @@ def update_positions():
     while True:
         data = read_esp32_data()
         if data:
-            current_pos_x, current_pos_y, current_pos_z = data
+            current_pos_x, current_pos_y, current_pos_z, stopped_by_sensor = data
             if proceed:
                 proceed=False
-                print(f"positions - X: {current_pos_x}, Y: {current_pos_y}, Z: {current_pos_z}")
+                print(f"positions - X: {current_pos_x}, Y: {current_pos_y}, Z: {current_pos_z}, stopped_by_sensor: {stopped_by_sensor}")
         else:
             print("Failed to initialize positions. Using default values.")
         
@@ -150,8 +150,8 @@ def parse_esp32_data(response):
                 pos_z = round(float(parts[2].strip()), 2)
                 stopped_by_sensor = int(parts[3].strip())  # Parse the flag as an integer
 
-                print(f"Parsed Data - pos_x: {pos_x}, pos_y: {pos_y}, pos_z: {pos_z}, stopped_by_sensor: {stopped_by_sensor}")
-                return pos_x, pos_y, pos_z
+                # print(f"Parsed Data - pos_x: {pos_x}, pos_y: {pos_y}, pos_z: {pos_z}, stopped_by_sensor: {stopped_by_sensor}")
+                return pos_x, pos_y, pos_z, stopped_by_sensor
 
     except ValueError as e:
         print(f"Error converting data to float: {e}")
