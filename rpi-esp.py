@@ -118,6 +118,7 @@ def read_esp32_data():
             if esp32_serial.in_waiting > 0:
                 byte = esp32_serial.read(1).decode('utf-8', errors='ignore')  # Ignore decoding errors
                 buffer += byte
+                print(byte)
                 if byte == '\n':  # End of line
                     break
 
@@ -133,13 +134,6 @@ def read_esp32_data():
         print(f"Unexpected error: {e}")
     return None
 
-def validate_esp32_data(data):
-    """
-    Validates the ESP32 data format.
-    Expected format: AK80 <float>, <float>, <float>, <int>
-    """
-    pattern = r"^AK80\s-?\d+\.\d+,\s-?\d+\.\d+,\s-?\d+\.\d+,\s[01]$"
-    return bool(re.match(pattern, data))
 
 def parse_esp32_data(response):
     try:
