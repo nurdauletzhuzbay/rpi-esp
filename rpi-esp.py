@@ -154,15 +154,15 @@ def parse_esp32_data(response):
     Returns: (pos_x, pos_y, pos_z, stopped_by_sensor)
     """
     try:
-        if validate_esp32_data(response):
-            parts = response[5:].split(',')  # Remove "AK80 " and split the rest
-            pos_x = round(float(parts[0].strip()), 2)
-            pos_y = round(float(parts[3].strip()), 2)
-            pos_z = round(float(parts[6].strip()), 2)
-            stopped_by_sensor = int(parts[9].strip())  # Extract the flag
-            
-            print(f"Parsed Data - pos_x: {pos_x}, pos_y: {pos_y}, pos_z: {pos_z}, stopped_by_sensor: {stopped_by_sensor}")
-            return pos_x, pos_y, pos_z
+        # Remove "AK80 " and split the remaining data
+        parts = response[5:].split(',')
+        pos_x = round(float(parts[0].strip()), 2)
+        pos_y = round(float(parts[3].strip()), 2)
+        pos_z = round(float(parts[6].strip()), 2)
+        stopped_by_sensor = int(parts[9].strip())  # Extract the flag
+
+        print(f"Parsed Data - pos_x: {pos_x}, pos_y: {pos_y}, pos_z: {pos_z}, stopped_by_sensor: {stopped_by_sensor}")
+        return pos_x, pos_y, pos_z, stopped_by_sensor
 
     except ValueError as e:
         print(f"Error converting data to float: {e}")
