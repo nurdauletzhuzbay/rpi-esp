@@ -166,7 +166,7 @@ def parse_esp32_data(response):
             stopped_by_sensor = int(parts[9].strip())  # Extract the flag
             
             print(f"Parsed Data - pos_x: {pos_x}, pos_y: {pos_y}, pos_z: {pos_z}, stopped_by_sensor: {stopped_by_sensor}")
-            return pos_x, pos_y, pos_z, stopped_by_sensor
+            return pos_x, pos_y, pos_z
 
     except ValueError as e:
         print(f"Error converting data to float: {e}")
