@@ -112,7 +112,7 @@ def read_esp32_data():
 
     try:
         esp32_serial.reset_input_buffer()
-        time.sleep(0.1)
+        time.sleep(0.5)
         bad_line = esp32_serial.readline().decode('utf-8').strip()
         print("before")
         print(bad_line)
