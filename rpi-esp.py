@@ -119,7 +119,9 @@ def change_chassis(chassis_command, esp32_serial):
 
 def read_esp32_data():
     try:
-        response = esp32_serial.readline().decode('utf-8').strip()
+        response=""
+        while response=="":
+            response = esp32_serial.readline().decode('utf-8').strip()
         print(f"RAW {response}")
         return parse_esp32_data(response)
     except serial.SerialException as e:
