@@ -38,14 +38,11 @@ except Exception as e:
 #     return current_pos_x, current_pos_y, current_pos_z
 
 def update_positions():
-    global current_pos_x, current_pos_y, current_pos_z, proceed
+    global current_pos_x, current_pos_y, current_pos_z, stopped_by_sensor
     while True:
         data = read_esp32_data()
         if data:
             current_pos_x, current_pos_y, current_pos_z, stopped_by_sensor = data
-            if proceed:
-                proceed=False
-                print(f"positions - X: {current_pos_x}, Y: {current_pos_y}, Z: {current_pos_z}, stopped_by_sensor: {stopped_by_sensor}")
         else:
             print("Failed to initialize positions. Using default values.")
         
@@ -121,15 +118,9 @@ def change_chassis(chassis_command, esp32_serial):
 
 
 def read_esp32_data():
-
     try:
-        while True:
-            if esp32_serial.in_waiting>1:
-                response = esp32_serial.readline().decode('utf-8').strip()
-                return parse_esp32_data(response)
-
-        # print("after")
-        # print(response)
+        response = esp32_serial.readline().decode('utf-8').strip()
+        return parse_esp32_data(response)
     except serial.SerialException as e:
         print(f"Serial error: {e}")
     except Exception as e:
@@ -180,7 +171,7 @@ def parse_esp32_data(response):
 
 
 def interactive_control():
-    global proceed
+    global current_pos_x,current_pos_y,current_pos_z,stopped_by_sensor
     try:
         print("\nInteractive Robot Control")
         print("Commands:")
@@ -192,8 +183,6 @@ def interactive_control():
 
         while True:
             command = input("\nEnter command: ").strip().lower()
-            # read_esp32_data()
-            proceed=True
 
 
             if command.startswith("move"):
@@ -241,6 +230,7 @@ def interactive_control():
 
             else:
                 print("Invalid command. Use move, chassis, grasp, release, fix, unfix, or exit.")
+            print(f"positions - X: {current_pos_x}, Y: {current_pos_y}, Z: {current_pos_z}, stopped_by_sensor: {stopped_by_sensor}")
 
     except KeyboardInterrupt:
         print("\nExiting program...")
@@ -253,7 +243,7 @@ if __name__ == "__main__":
     current_pos_x = 0.0
     current_pos_y = 0.0
     current_pos_z = 0.0
-    proceed = False
+    stopped_by_sensor = False
     # initialize_positions() 
     pos_thread = threading.Thread(target=update_positions)
     pos_thread.start()
