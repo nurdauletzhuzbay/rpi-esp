@@ -128,10 +128,13 @@ def read_esp32_data():
         # bad_line = esp32_serial.readline().decode('utf-8').strip()
         # print("before")
         # print(bad_line)
-        response = esp32_serial.readline().decode('utf-8').strip()
+        while True:
+            if esp32_serial.in_waiting>10:
+                response = esp32_serial.readline().decode('utf-8').strip()
+                return parse_esp32_data(response)
+
         # print("after")
         # print(response)
-        return parse_esp32_data(response)
     except serial.SerialException as e:
         print(f"Serial error: {e}")
     except Exception as e:
