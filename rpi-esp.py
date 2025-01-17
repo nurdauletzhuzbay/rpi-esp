@@ -123,13 +123,8 @@ def change_chassis(chassis_command, esp32_serial):
 def read_esp32_data():
 
     try:
-        # esp32_serial.reset_input_buffer()
-        # time.sleep(0.5)
-        # bad_line = esp32_serial.readline().decode('utf-8').strip()
-        # print("before")
-        # print(bad_line)
         while True:
-            if esp32_serial.in_waiting>10:
+            if esp32_serial.in_waiting>1:
                 response = esp32_serial.readline().decode('utf-8').strip()
                 return parse_esp32_data(response)
 
