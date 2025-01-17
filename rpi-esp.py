@@ -1,6 +1,7 @@
 import serial
 import time
 import re
+import threading
 
 ESP32_PORT = '/dev/ttyUSB0'
 ARDUINO_PORT = '/dev/ttyUSB1'
@@ -35,6 +36,18 @@ def initialize_positions():
         i += 1
     
     return current_pos_x, current_pos_y, current_pos_z
+
+def update_positions():
+    global current_pos_x, current_pos_y, current_pos_z, proceed
+    while True:
+        data = read_esp32_data()
+        if data:
+            current_pos_x, current_pos_y, current_pos_z = data
+            if proceed:
+                proceed=False
+                print(f"positions - X: {current_pos_x}, Y: {current_pos_y}, Z: {current_pos_z}")
+        else:
+            print("Failed to initialize positions. Using default values.")
         
 def send_nano_command(command):
     try:
@@ -47,29 +60,28 @@ def send_nano_command(command):
         print(f"Error sending command to Nano: {e}")
         
 # Function to send a movement command
-def send_movement_command(direction, distance):
+def send_movement_command(direction, mode, distance):
     global current_pos_x, current_pos_y, current_pos_z
     # distance = distance/1000        
-    latest_data = read_esp32_data()
-    if latest_data:
-        current_pos_x, current_pos_y, current_pos_z = latest_data
+    # latest_data = read_esp32_data()
+    # if latest_data:
+    #     current_pos_x, current_pos_y, current_pos_z = latest_data
 
-        
     cmd = ""
     if direction == "forward":
         current_pos_x += distance
-        cmd = f"MOVX,{current_pos_x:.4f}"
+        cmd = f"MOVX,{mode},{current_pos_x:.4f}"
     elif direction == "backward":
         current_pos_x -= distance
-        cmd = f"MOVX,{current_pos_x:.4f}"
+        cmd = f"MOVX,{mode},{current_pos_x:.4f}"
 
     elif direction == "left":
         current_pos_y += distance
-        cmd = f"MOVY,{current_pos_y:.4f}"
+        cmd = f"MOVY,{mode},{current_pos_y:.4f}"
 
     elif direction == "right":
         current_pos_y -= distance
-        cmd = f"MOVY,{current_pos_y:.4f}"
+        cmd = f"MOVY,{mode},{current_pos_y:.4f}"
 
     elif direction == "up":
         current_pos_z += distance
@@ -112,7 +124,7 @@ def read_esp32_data():
 
     try:
         esp32_serial.reset_input_buffer()
-        time.sleep(0.5)
+        time.sleep(0.1)
         bad_line = esp32_serial.readline().decode('utf-8').strip()
         print("before")
         print(bad_line)
@@ -170,6 +182,7 @@ def parse_esp32_data(response):
 
 
 def interactive_control():
+    global proceed
     try:
         print("\nInteractive Robot Control")
         print("Commands:")
@@ -181,23 +194,33 @@ def interactive_control():
 
         while True:
             command = input("\nEnter command: ").strip().lower()
-            read_esp32_data()
+            # read_esp32_data()
+            proceed=True
 
 
             if command.startswith("move"):
                 parts = command.split()
-                if len(parts) == 3:
+                if len(parts) == 4:
                     direction = parts[1]
+                    mode_str = parts[2]
                     try:
-                        distance = float(parts[2])
-                        if direction in ["forward", "backward", "left", "right", "up", "down"]:
-                            send_movement_command(direction, distance)
+                        distance = float(parts[3])
+                        mode = -1
+                        if mode_str == "sensor-front":
+                            mode = 1
+                        elif mode_str == "sensor-back":
+                            mode = 2
+                        elif mode_str == "no-sensor":
+                            mode = 0
+
+                        if direction in ["forward", "backward", "left", "right", "up", "down"] and mode != -1:
+                            send_movement_command(direction, mode, distance)
                         else:
-                            print("Invalid direction. Use forward, backward, left, right, up, or down.")
+                            print("Invalid direction or mode. Use valid direction and mode (sensor-front, sensor-back, no-sensor).")
                     except ValueError:
                         print("Invalid distance. Use a numeric value.")
                 else:
-                    print("Invalid format. Use: move <direction> <distance>")
+                    print("Invalid format. Use: move <direction> <mode> <distance>")
                 
 
             elif command.startswith("chassis"):
@@ -232,6 +255,8 @@ if __name__ == "__main__":
     current_pos_x = 0.0
     current_pos_y = 0.0
     current_pos_z = 0.0
-
-    initialize_positions() 
+    proceed = False
+    # initialize_positions() 
+    pos_thread = threading.Thread(update_positions)
+    pos_thread.start()
     interactive_control()
