@@ -257,6 +257,6 @@ if __name__ == "__main__":
     current_pos_z = 0.0
     proceed = False
     # initialize_positions() 
-    pos_thread = threading.Thread(update_positions,args=None)
+    pos_thread = threading.Thread(target=update_positions,args=None)
     pos_thread.start()
     interactive_control()
