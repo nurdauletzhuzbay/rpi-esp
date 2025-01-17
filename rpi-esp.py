@@ -109,25 +109,17 @@ def change_chassis(chassis_command, esp32_serial):
 
 
 def read_esp32_data():
+
     try:
-        buffer = ""
-        esp32_serial.flushInput()
-
-        # Read until a full line is received
-        while True:
-            if esp32_serial.in_waiting > 0:
-                byte = esp32_serial.read(1).decode('utf-8', errors='ignore')  # Ignore decoding errors
-                buffer += byte
-                print(byte)
-                if byte == '\n':  # End of line
-                    break
-
-        response = buffer.strip()
-        print(f"Raw ESP32 Data: {response}")
-
+        esp32_serial.reset_input_buffer()
+        time.sleep(0.1)
+        bad_line = esp32_serial.readline().decode('utf-8').strip()
+        print("before")
+        print(bad_line)
+        response = esp32_serial.readline().decode('utf-8').strip()
+        print("after")
+        print(response)
         return parse_esp32_data(response)
-
-
     except serial.SerialException as e:
         print(f"Serial error: {e}")
     except Exception as e:
