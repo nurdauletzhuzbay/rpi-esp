@@ -21,21 +21,21 @@ except Exception as e:
 
 
 
-def initialize_positions():
-    global current_pos_x, current_pos_y, current_pos_z
-    i = 0
-    time.sleep(2)
-    while i<5:
+# def initialize_positions():
+#     global current_pos_x, current_pos_y, current_pos_z
+#     i = 0
+#     time.sleep(2)
+#     while i<5:
         
-        initial_data = read_esp32_data()
-        if initial_data:
-            current_pos_x, current_pos_y, current_pos_z = initial_data
-            print(f"Initialized positions - X: {current_pos_x}, Y: {current_pos_y}, Z: {current_pos_z}")
-        else:
-            print("Failed to initialize positions. Using default values.")
-        i += 1
+#         initial_data = read_esp32_data()
+#         if initial_data:
+#             current_pos_x, current_pos_y, current_pos_z = initial_data
+#             print(f"Initialized positions - X: {current_pos_x}, Y: {current_pos_y}, Z: {current_pos_z}")
+#         else:
+#             print("Failed to initialize positions. Using default values.")
+#         i += 1
     
-    return current_pos_x, current_pos_y, current_pos_z
+#     return current_pos_x, current_pos_y, current_pos_z
 
 def update_positions():
     global current_pos_x, current_pos_y, current_pos_z, proceed
@@ -123,9 +123,9 @@ def change_chassis(chassis_command, esp32_serial):
 def read_esp32_data():
 
     try:
-        esp32_serial.reset_input_buffer()
-        time.sleep(0.1)
-        bad_line = esp32_serial.readline().decode('utf-8').strip()
+        # esp32_serial.reset_input_buffer()
+        # time.sleep(0.5)
+        # bad_line = esp32_serial.readline().decode('utf-8').strip()
         # print("before")
         # print(bad_line)
         response = esp32_serial.readline().decode('utf-8').strip()
