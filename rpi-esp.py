@@ -124,12 +124,8 @@ def read_esp32_data():
         response = buffer.strip()
         print(f"Raw ESP32 Data: {response}")
 
-        # Validate and parse the received data
-        if validate_esp32_data(response):
-            return parse_esp32_data(response)
-        else:
-            print("Invalid data format received.")
-            return None
+
+        return parse_esp32_data(response)
 
     except serial.SerialException as e:
         print(f"Serial error: {e}")
