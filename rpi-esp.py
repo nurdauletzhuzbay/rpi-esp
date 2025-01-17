@@ -2,8 +2,8 @@ import serial
 import time
 import re
 
-ESP32_PORT = '/dev/ttyUSB1'
-ARDUINO_PORT = '/dev/ttyUSB0'
+ESP32_PORT = '/dev/ttyUSB0'
+ARDUINO_PORT = '/dev/ttyUSB1'
 BAUD_RATE_ESP = 38400
 BAUD_RATE_NANO = 9600
 TIMEOUT = 1
@@ -111,52 +111,68 @@ def change_chassis(chassis_command, esp32_serial):
 def read_esp32_data():
     try:
         buffer = ""
-        start_time = time.time()
         esp32_serial.flushInput()
 
-        # Read until a full line is received or timeout
+        # Read until a full line is received
         while True:
             if esp32_serial.in_waiting > 0:
-                byte = esp32_serial.read(1).decode('utf-8')
+                byte = esp32_serial.read(1).decode('utf-8', errors='ignore')  # Ignore decoding errors
                 buffer += byte
                 if byte == '\n':  # End of line
                     break
-            
-            # Timeout if no data for 1 second
-            if time.time() - start_time > TIMEOUT:
-                print("Timeout while waiting for data from ESP32.")
-                return None
 
         response = buffer.strip()
         print(f"Raw ESP32 Data: {response}")
-        return parse_esp32_data(response)
+
+        # Validate and parse the received data
+        if validate_esp32_data(response):
+            return parse_esp32_data(response)
+        else:
+            print("Invalid data format received.")
+            return None
 
     except serial.SerialException as e:
         print(f"Serial error: {e}")
-    except UnicodeDecodeError as e:
-        print(f"Decoding error: {e}")
     except Exception as e:
         print(f"Unexpected error: {e}")
     return None
 
+def validate_esp32_data(data):
+    """
+    Validates the ESP32 data format.
+    Expected format: AK80 <float>, ..., <int>
+    (9 floats followed by a single integer).
+    """
+    pattern = (
+        r"^AK80\s"
+        r"-?\d+\.\d+,\s-?\d+\.\d+,\s-?\d+\.\d+,\s"  # pos_x, vel_x, cur_x
+        r"-?\d+\.\d+,\s-?\d+\.\d+,\s-?\d+\.\d+,\s"  # pos_y, vel_y, cur_y
+        r"-?\d+\.\d+,\s-?\d+\.\d+,\s-?\d+\.\d+,\s"  # pos_z, vel_z, cur_z
+        r"[01]$"  # stoppedBySensor flag (0 or 1)
+    )
+    return bool(re.match(pattern, data))
+
 def parse_esp32_data(response):
+    """
+    Parses the ESP32 data and extracts positions and stoppedBySensor flag.
+    Returns: (pos_x, pos_y, pos_z, stopped_by_sensor)
+    """
     try:
-        if response.startswith("AK80"):
-            parts = response[5:].split(',')
-
-            if len(parts) == 4:  # Expecting 4 parts now (3 positions and the flag)
-                pos_x = round(float(parts[0].strip()), 4)
-                pos_y = round(float(parts[1].strip()), 4)
-                pos_z = round(float(parts[2].strip()), 4)
-                stopped_by_sensor = int(parts[3].strip())  # Parse the flag as an integer
-
-                print(f"Parsed Data - pos_x: {pos_x}, pos_y: {pos_y}, pos_z: {pos_z}, stopped_by_sensor: {stopped_by_sensor}")
-                return pos_x, pos_y, pos_z
+        if validate_esp32_data(response):
+            parts = response[5:].split(',')  # Remove "AK80 " and split the rest
+            pos_x = round(float(parts[0].strip()), 2)
+            pos_y = round(float(parts[3].strip()), 2)
+            pos_z = round(float(parts[6].strip()), 2)
+            stopped_by_sensor = int(parts[9].strip())  # Extract the flag
+            
+            print(f"Parsed Data - pos_x: {pos_x}, pos_y: {pos_y}, pos_z: {pos_z}, stopped_by_sensor: {stopped_by_sensor}")
+            return pos_x, pos_y, pos_z, stopped_by_sensor
 
     except ValueError as e:
         print(f"Error converting data to float: {e}")
     except Exception as e:
         print(f"Error parsing ESP32 data: {e}")
+    
     return None
 
 
