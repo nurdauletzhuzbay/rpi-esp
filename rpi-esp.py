@@ -3,7 +3,7 @@ import time
 import re
 import threading
 
-ESP32_PORT = '/dev/ttyUSB2'
+ESP32_PORT = '/dev/ttyUSB0'
 ARDUINO_PORT = '/dev/ttyUSB1'
 BAUD_RATE_ESP = 38400
 BAUD_RATE_NANO = 9600
