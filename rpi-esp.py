@@ -3,7 +3,7 @@ import time
 import re
 import threading
 
-ESP32_PORT = '/dev/ttyUSB0'
+ESP32_PORT = '/dev/ttyUSB2'
 ARDUINO_PORT = '/dev/ttyUSB1'
 BAUD_RATE_ESP = 19200
 BAUD_RATE_NANO = 9600
@@ -121,16 +121,15 @@ def change_chassis(chassis_command, esp32_serial):
 
 
 def read_esp32_data():
+
     try:
-        response=""
-        while response=="":
-            response = esp32_serial.readline().decode('utf-8').strip()
-        # print(f"RAW {response}")
-        return parse_esp32_data(response)
+        if esp32_serial.in_waiting > 0:
+            response = esp32_serial.readline().decode('utf-8', errors='ignore').strip()
+            if response:
+                print(f"Raw data received: {response}")  # Debug raw data
+                return parse_esp32_data(response.strip())
     except serial.SerialException as e:
         print(f"Serial error: {e}")
-    except Exception as e:
-        print(f"Unexpected error: {e}")
 
 
 def parse_esp32_data(response):
