@@ -3,9 +3,9 @@ import time
 import re
 import threading
 
-ESP32_PORT = '/dev/ttyUSB2'
+ESP32_PORT = '/dev/ttyUSB0'
 ARDUINO_PORT = '/dev/ttyUSB1'
-BAUD_RATE_ESP = 38400
+BAUD_RATE_ESP = 19200
 BAUD_RATE_NANO = 9600
 TIMEOUT = 1
 
@@ -17,7 +17,6 @@ try:
 except Exception as e:
     print(f"Error initializing serial port: {e}")
     exit()
-
 
 
 
@@ -71,18 +70,18 @@ def send_movement_command(direction, mode, distance):
     cmd = ""
     if direction == "forward":
         current_pos_x += distance
-        cmd = f"MOVX,{mode},{current_pos_x:.4f}"
+        cmd = f"MOVX,{current_pos_x:.4f}"
     elif direction == "backward":
         current_pos_x -= distance
-        cmd = f"MOVX,{mode},{current_pos_x:.4f}"
+        cmd = f"MOVX,{current_pos_x:.4f}"
 
     elif direction == "left":
         current_pos_y += distance
-        cmd = f"MOVY,{mode},{current_pos_y:.4f}"
+        cmd = f"MOVY,{current_pos_y:.4f}"
 
     elif direction == "right":
         current_pos_y -= distance
-        cmd = f"MOVY,{mode},{current_pos_y:.4f}"
+        cmd = f"MOVY,{current_pos_y:.4f}"
 
     elif direction == "up":
         current_pos_z += distance
@@ -190,30 +189,44 @@ def interactive_control():
         while True:
             command = input("\nEnter command: ").strip().lower()
 
-
             if command.startswith("move"):
                 parts = command.split()
-                if len(parts) == 4:
+                if len(parts) == 3:
                     direction = parts[1]
-                    mode_str = parts[2]
                     try:
-                        distance = float(parts[3])
-                        mode = -1
-                        if mode_str == "sensor-front":
-                            mode = 1
-                        elif mode_str == "sensor-back":
-                            mode = 2
-                        elif mode_str == "no-sensor":
-                            mode = 0
-
-                        if direction in ["forward", "backward", "left", "right", "up", "down"] and mode != -1:
-                            send_movement_command(direction, mode, distance)
+                        distance = float(parts[2])
+                        if direction in ["forward", "backward", "left", "right", "up", "down"]:
+                            send_movement_command(direction, distance)
                         else:
-                            print("Invalid direction or mode. Use valid direction and mode (sensor-front, sensor-back, no-sensor).")
+                            print("Invalid direction. Use forward, backward, left, right, up, or down.")
                     except ValueError:
                         print("Invalid distance. Use a numeric value.")
                 else:
-                    print("Invalid format. Use: move <direction> <mode> <distance>")
+                    print("Invalid format. Use: move <direction> <distance>")
+                    
+            # if command.startswith("move"):
+            #     parts = command.split()
+            #     if len(parts) == 4:
+            #         direction = parts[1]
+            #         mode_str = parts[2]
+            #         try:
+            #             distance = float(parts[3])
+            #             mode = -1
+            #             if mode_str == "sensor-front":
+            #                 mode = 1
+            #             elif mode_str == "sensor-back":
+            #                 mode = 2
+            #             elif mode_str == "no-sensor":
+            #                 mode = 0
+
+            #             if direction in ["forward", "backward", "left", "right", "up", "down"] and mode != -1:
+            #                 send_movement_command(direction, mode, distance)
+            #             else:
+            #                 print("Invalid direction or mode. Use valid direction and mode (sensor-front, sensor-back, no-sensor).")
+            #         except ValueError:
+            #             print("Invalid distance. Use a numeric value.")
+            #     else:
+            #         print("Invalid format. Use: move <direction> <mode> <distance>")
                 
 
             elif command.startswith("chassis"):
