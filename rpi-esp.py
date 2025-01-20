@@ -20,34 +20,34 @@ except Exception as e:
 
 
 
-# def initialize_positions():
-#     global current_pos_x, current_pos_y, current_pos_z
-#     i = 0
-#     time.sleep(2)
-#     while i<5:
+def initialize_positions():
+    global current_pos_x, current_pos_y, current_pos_z
+    i = 0
+    time.sleep(2)
+    while i<5:
         
-#         initial_data = read_esp32_data()
-#         if initial_data:
-#             current_pos_x, current_pos_y, current_pos_z = initial_data
-#             print(f"Initialized positions - X: {current_pos_x}, Y: {current_pos_y}, Z: {current_pos_z}")
-#         else:
-#             print("Failed to initialize positions. Using default values.")
-#         i += 1
+        initial_data = read_esp32_data()
+        if initial_data:
+            current_pos_x, current_pos_y, current_pos_z = initial_data
+            print(f"Initialized positions - X: {current_pos_x}, Y: {current_pos_y}, Z: {current_pos_z}")
+        else:
+            print("Failed to initialize positions. Using default values.")
+        i += 1
     
-#     return current_pos_x, current_pos_y, current_pos_z
+    return current_pos_x, current_pos_y, current_pos_z
 
-def update_positions():
-    global current_pos_x, current_pos_y, current_pos_z, stopped_by_sensor,is_running
-    try:
-        while is_running:
-            data = read_esp32_data()
-            if data:
-                current_pos_x, current_pos_y, current_pos_z, stopped_by_sensor = data
-            else:
-                print("Failed to initialize positions. Using default values.")
+# def update_positions():
+#     global current_pos_x, current_pos_y, current_pos_z, stopped_by_sensor,is_running
+#     try:
+#         while is_running:
+#             data = read_esp32_data()
+#             if data:
+#                 current_pos_x, current_pos_y, current_pos_z, stopped_by_sensor = data
+#             else:
+#                 print("Failed to initialize positions. Using default values.")
             
-    except:
-        print("exiting update loop")
+#     except:
+#         print("exiting update loop")
         
 def send_nano_command(command):
     try:
@@ -145,7 +145,7 @@ def parse_esp32_data(response):
                 stopped_by_sensor = int(parts[3].strip())  # Parse the flag as an integer
 
                 # print(f"Parsed Data - pos_x: {pos_x}, pos_y: {pos_y}, pos_z: {pos_z}, stopped_by_sensor: {stopped_by_sensor}")
-                return pos_x, pos_y, pos_z, stopped_by_sensor
+                return pos_x, pos_y, pos_z
 
     except ValueError as e:
         print(f"Error converting data to float: {e}")
@@ -249,7 +249,7 @@ def interactive_control():
 
             else:
                 print("Invalid command. Use move, chassis, grasp, release, fix, unfix, or exit.")
-            print(f"positions - X: {current_pos_x}, Y: {current_pos_y}, Z: {current_pos_z}, stopped_by_sensor: {stopped_by_sensor}")
+            # print(f"positions - X: {current_pos_x}, Y: {current_pos_y}, Z: {current_pos_z}, stopped_by_sensor: {stopped_by_sensor}")
 
     except KeyboardInterrupt:
         print("\nExiting program...")
@@ -264,8 +264,8 @@ if __name__ == "__main__":
     current_pos_y = 0.0
     current_pos_z = 0.0
     stopped_by_sensor = 0
-    is_running = True
-    # initialize_positions() 
-    pos_thread = threading.Thread(target=update_positions)
-    pos_thread.start()
+    # is_running = True
+    initialize_positions() 
+    # pos_thread = threading.Thread(target=update_positions)
+    # pos_thread.start()
     interactive_control()
