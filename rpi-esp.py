@@ -39,12 +39,15 @@ except Exception as e:
 
 def update_positions():
     global current_pos_x, current_pos_y, current_pos_z, stopped_by_sensor
-    while True:
-        data = read_esp32_data()
-        if data:
-            current_pos_x, current_pos_y, current_pos_z, stopped_by_sensor = data
-        else:
-            print("Failed to initialize positions. Using default values.")
+    try:
+        while True:
+            data = read_esp32_data()
+            if data:
+                current_pos_x, current_pos_y, current_pos_z, stopped_by_sensor = data
+            else:
+                print("Failed to initialize positions. Using default values.")
+    except:
+        print("exiting update loop")
         
 def send_nano_command(command):
     try:
