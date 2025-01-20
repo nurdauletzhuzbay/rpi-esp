@@ -3,7 +3,7 @@ import time
 import re
 import threading
 
-ESP32_PORT = '/dev/ttyUSB0'
+ESP32_PORT = '/dev/ttyUSB2'
 ARDUINO_PORT = '/dev/ttyUSB1'
 BAUD_RATE_ESP = 38400
 BAUD_RATE_NANO = 9600
@@ -245,7 +245,7 @@ if __name__ == "__main__":
     current_pos_x = 0.0
     current_pos_y = 0.0
     current_pos_z = 0.0
-    stopped_by_sensor = False
+    stopped_by_sensor = 0
     # initialize_positions() 
     pos_thread = threading.Thread(target=update_positions)
     pos_thread.start()
