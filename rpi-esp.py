@@ -38,14 +38,15 @@ except Exception as e:
 #     return current_pos_x, current_pos_y, current_pos_z
 
 def update_positions():
-    global current_pos_x, current_pos_y, current_pos_z, stopped_by_sensor
+    global current_pos_x, current_pos_y, current_pos_z, stopped_by_sensor,is_running
     try:
-        while True:
+        while is_running:
             data = read_esp32_data()
             if data:
                 current_pos_x, current_pos_y, current_pos_z, stopped_by_sensor = data
             else:
                 print("Failed to initialize positions. Using default values.")
+            
     except:
         print("exiting update loop")
         
@@ -176,7 +177,7 @@ def parse_esp32_data(response):
 
 
 def interactive_control():
-    global current_pos_x,current_pos_y,current_pos_z,stopped_by_sensor
+    global current_pos_x,current_pos_y,current_pos_z,stopped_by_sensor,is_running
     try:
         print("\nInteractive Robot Control")
         print("Commands:")
@@ -242,6 +243,7 @@ def interactive_control():
     finally:
         esp32_serial.close()
         nano_serial.close()
+        is_running=False
         print("Serial ports closed.")
 
 if __name__ == "__main__":
@@ -249,6 +251,7 @@ if __name__ == "__main__":
     current_pos_y = 0.0
     current_pos_z = 0.0
     stopped_by_sensor = 0
+    is_running = True
     # initialize_positions() 
     pos_thread = threading.Thread(target=update_positions)
     pos_thread.start()
