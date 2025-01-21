@@ -120,12 +120,13 @@ def parse_esp32_data(response):
         if response.startswith("AK80"):
             parts = response[5:].split(',')
 
-            if len(parts) == 9:
-                pos_x = round(float(parts[0].strip()), 4)
-                pos_y = round(float(parts[3].strip()), 4)
-                pos_z = round(float(parts[6].strip()), 4)
+            if len(parts) == 4:  # Expecting 4 parts now (3 positions and the flag)
+                pos_x = round(float(parts[0].strip()), 2)
+                pos_y = round(float(parts[1].strip()), 2)
+                pos_z = round(float(parts[2].strip()), 2)
+                stopped_by_sensor = int(parts[3].strip())  # Parse the flag as an integer
 
-                print(f"Parsed Data - pos_x: {pos_x}, pos_y: {pos_y}, pos_z: {pos_z}")
+                # print(f"Parsed Data - pos_x: {pos_x}, pos_y: {pos_y}, pos_z: {pos_z}, stopped_by_sensor: {stopped_by_sensor}")
                 return pos_x, pos_y, pos_z
 
     except ValueError as e:
@@ -134,55 +135,60 @@ def parse_esp32_data(response):
         print(f"Error parsing ESP32 data: {e}")
     return None
 
-
 def delivery_logic():
     # Execute delivery steps
     change_chassis("x")
-    send_movement_command("forward", 640)
+    send_movement_command("forward", 652)
     time.sleep(2)
     change_chassis("y")
-    send_movement_command("left", 1680)
-    time.sleep(2)
-    change_chassis("x")
-    send_movement_command("forward", 2550)
+    send_movement_command("left", 1677)
     time.sleep(3)
+    change_chassis("x")
+    send_movement_command("forward", 2545)
+    time.sleep(4)
     change_chassis("stable")
-    send_movement_command("down", 1.2)
-    time.sleep(2)
-    send_nano_command("release")
-    time.sleep(1)
-    send_nano_command("grasp")
-    send_movement_command("up", 1.2)
     time.sleep(2)
     change_chassis("y")
-    send_movement_command("right", 840)
+    send_movement_command("right", 845)
     time.sleep(2)
     change_chassis("stable")
-    send_movement_command("down", 1.5)
-    send_nano_command("release")
-    send_movement_command("up", 1.5)
     time.sleep(2)
-    send_nano_command("grasp")
     change_chassis("y")
-    send_movement_command("left", 840)
-    change_chassis("stable")
-    send_movement_command("down", 1.5)
+    send_movement_command("left", 845)
     time.sleep(2)
-    send_nano_command("release")
-    send_nano_command("grasp")
-    send_movement_command("up", 1.5)
+    change_chassis("stable")
+    time.sleep(2)
     change_chassis("x")
     send_movement_command("backward", 2550)
+    time.sleep(4)
     change_chassis("y")
     send_movement_command("right", 1680)
+    time.sleep(3)
     change_chassis("x")
     send_movement_command("backward", 640)
+    time.sleep(2)
     change_chassis("stable")
-    send_movement_command("down", 1.2)
-    send_nano_command("release")
+    time.sleep(2)
+    change_chassis("x")
+    send_movement_command("forward", 652)
+    time.sleep(2)
+    change_chassis("stable")
+    time.sleep(2)
+    change_chassis("x")
+    send_movement_command("backward", 652)
+    time.sleep(2)
+    change_chassis("stable")
+
 
 
 if __name__ == "__main__":
     initialize_positions()
-    delivery_logic()
-    print("Delivery logic executed successfully.")
+    print("Press Enter to execute delivery logic...")
+    while True:
+        user_input = input("\nPress Enter to start or type 'exit' to quit: ")
+        if user_input.strip().lower() == 'exit':
+            print("Exiting program.")
+            break
+        elif user_input.strip() == '':
+            delivery_logic()
+            print("Delivery logic executed successfully.")
