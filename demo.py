@@ -25,7 +25,8 @@ def initialize_positions():
     global current_pos_x, current_pos_y, current_pos_z
     i = 0
     time.sleep(2)
-    while i < 5:
+    while i<5:
+        
         initial_data = read_esp32_data()
         if initial_data:
             current_pos_x, current_pos_y, current_pos_z = initial_data
@@ -33,6 +34,8 @@ def initialize_positions():
         else:
             print("Failed to initialize positions. Using default values.")
         i += 1
+    
+    return current_pos_x, current_pos_y, current_pos_z
         
 def send_nano_command(command):
     try:
@@ -111,10 +114,7 @@ def read_esp32_data():
                 return parse_esp32_data(response.strip())
     except serial.SerialException as e:
         print(f"Serial error: {e}")
-    except Exception as e:
-        print(f"Unexpected error: {e}")
-    return None
-
+        
 def parse_esp32_data(response):
     try:
         if response.startswith("AK80"):
@@ -182,6 +182,10 @@ def delivery_logic():
 
 
 if __name__ == "__main__":
+    current_pos_x = 0.0
+    current_pos_y = 0.0
+    current_pos_z = 0.0
+    stopped_by_sensor = 0
     initialize_positions()
     print("Press Enter to execute delivery logic...")
     while True:
