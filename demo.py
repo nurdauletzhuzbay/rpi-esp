@@ -244,12 +244,12 @@ def delivery_logic():
 #         return_logic()
 
 @app.route('/delivery', methods=['GET'])
-def execute_logic():
+def delivery_flask():
         print("Executing delivery logic...")
         delivery_logic()
 
 @app.route('/return', methods=['GET'])
-def execute_logic():
+def return_flask():
         print("Executing return logic...")
         return_logic()
            
