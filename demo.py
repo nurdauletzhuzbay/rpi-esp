@@ -156,14 +156,8 @@ def return_logic():
     send_movement_command("up", 1.75)
     time.sleep(4)
     send_nano_command("grasp")
-    time.sleep(16)
-    change_chassis("x")
-    send_movement_command("backward", 652)
-    time.sleep(6)
-    change_chassis("stable")
+
  
-    
-       
 def delivery_logic():
     # Execute delivery steps
     # time.sleep(5)
@@ -171,7 +165,7 @@ def delivery_logic():
     send_movement_command("forward", 652)
     time.sleep(6)
     change_chassis("y")
-    send_movement_command("left", 1677)
+    send_movement_command("left", 1675)
     time.sleep(9)
     change_chassis("x")
     send_movement_command("forward", 2545)
@@ -223,7 +217,59 @@ def delivery_logic():
     time.sleep(4)
     send_nano_command("grasp")
 
+def second_delivery():
+    change_chassis("x")
+    send_movement_command("forward", 1275)
+    time.sleep(7)
+    change_chassis("y")
+    send_movement_command("right", 847)
+    time.sleep(7)
+    change_chassis("stable")
+    send_movement_command("down", 1.75)
+    time.sleep(7)
+    send_nano_command("release")
+    time.sleep(14)
+    send_nano_command("grasp")
+    send_movement_command("up", 1.75)
+    time.sleep(21)
+    change_chassis("y")
+    send_movement_command("left", 847)
+    time.sleep(7)
+    change_chassis("x")
+    send_movement_command("backward", 1920)
+    time.sleep(12)
+    change_chassis("stable")
+    send_movement_command("down", 1.22)
+    time.sleep(16)
+    send_nano_command("release")
+    send_movement_command("up", 1.22)
+    time.sleep(4)
+    send_nano_command("grasp")
 
+def second_return():
+    send_movement_command("down", 1.22)
+    time.sleep(7)
+    send_nano_command("release")
+    time.sleep(9)
+    send_nano_command("grasp")
+    send_movement_command("up", 1.22)
+    time.sleep(16)
+    change_chassis("x")
+    send_movement_command("forward", 652)
+    time.sleep(6)
+    change_chassis("stable")
+    send_movement_command("down", 1.35)
+    time.sleep(17)
+    send_nano_command("release")
+    send_movement_command("up", 1.35)
+    time.sleep(4)
+    send_nano_command("grasp")
+
+    
+    
+    
+    
+    
 @app.route('/delivery', methods=['GET'])
 def delivery_flask():
         print("Executing delivery logic...")
