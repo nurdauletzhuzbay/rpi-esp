@@ -136,11 +136,33 @@ def parse_esp32_data(response):
     return None
 
 
-
+def return_logic():
+    send_movement_command("down", 1.22)
+    time.sleep(7)
+    send_nano_command("release")
+    time.sleep(9)
+    send_nano_command("grasp")
+    send_movement_command("up", 1.22)
+    time.sleep(16)
+    change_chassis("x")
+    send_movement_command("forward", 652)
+    time.sleep(6)
+    change_chassis("stable")
+    send_movement_command("down", 1.75)
+    time.sleep(20)
+    send_nano_command("release")
+    send_movement_command("up", 1.75)
+    time.sleep(4)
+    send_nano_command("grasp")
+    time.sleep(16)
+    change_chassis("x")
+    send_movement_command("backward", 652)
+    time.sleep(6)
+    change_chassis("stable")
     
 def delivery_logic():
     # Execute delivery steps
-    time.sleep(5)
+    # time.sleep(5)
     change_chassis("x")
     send_movement_command("forward", 652)
     time.sleep(6)
@@ -196,15 +218,7 @@ def delivery_logic():
     send_movement_command("up", 1.22)
     time.sleep(4)
     send_nano_command("grasp")
-    # change_chassis("x")
-    # send_movement_command("forward", 652)
-    # time.sleep(6)
-    # change_chassis("stable")
-    # time.sleep(2)
-    # change_chassis("x")
-    # send_movement_command("backward", 652)
-    # time.sleep(6)
-    # change_chassis("stable")
+
 
 
 
