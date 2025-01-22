@@ -2,16 +2,16 @@ import serial
 import time
 
 ESP32_PORT = '/dev/ttyUSB0'
-ARDUINO_PORT = '/dev/ttyUSB1'
+ARDUINO_PORT = '/dev/ttyUSB2'
 BAUD_RATE_ESP = 19200
 BAUD_RATE_NANO = 9600
 TIMEOUT = 1
 
 try:
     esp32_serial = serial.Serial(ESP32_PORT, BAUD_RATE_ESP, timeout=TIMEOUT)
-    # nano_serial = serial.Serial(ARDUINO_PORT, BAUD_RATE_NANO, timeout=TIMEOUT)
+    nano_serial = serial.Serial(ARDUINO_PORT, BAUD_RATE_NANO, timeout=TIMEOUT)
     print(f"Connected to ESP32 on {ESP32_PORT}")
-    # print(f"Connected to NANO on {ARDUINO_PORT}")
+    print(f"Connected to NANO on {ARDUINO_PORT}")
 except Exception as e:
     print(f"Error initializing serial port: {e}")
     exit()
@@ -37,15 +37,15 @@ def initialize_positions():
     
     return current_pos_x, current_pos_y, current_pos_z
         
-# def send_nano_command(command):
-#     try:
-#         if nano_serial.is_open:
-#             nano_serial.write((command + '\n').encode('utf-8'))
-#             print(f"Sent command to Nano: {command}")
-#         else:
-#             print("Nano serial port is not open.")
-#     except Exception as e:
-#         print(f"Error sending command to Nano: {e}")
+def send_nano_command(command):
+    try:
+        if nano_serial.is_open:
+            nano_serial.write((command + '\n').encode('utf-8'))
+            print(f"Sent command to Nano: {command}")
+        else:
+            print("Nano serial port is not open.")
+    except Exception as e:
+        print(f"Error sending command to Nano: {e}")
         
 # Function to send a movement command
 def send_movement_command(direction, distance):
@@ -138,47 +138,60 @@ def parse_esp32_data(response):
 def delivery_logic():
     # Execute delivery steps
     time.sleep(5)
-    change_chassis("x")
-    send_movement_command("forward", 652)
-    time.sleep(6)
-    change_chassis("y")
-    send_movement_command("left", 1677)
-    time.sleep(9)
-    change_chassis("x")
-    send_movement_command("forward", 2545)
+    send_movement_command("up", 1.22)
+    time.sleep(4)
+    send_nano_command("grasp")
     time.sleep(12)
-    change_chassis("stable")
-    time.sleep(2)
-    change_chassis("y")
-    send_movement_command("right", 847)
+    send_movement_command("down", 1.22)
     time.sleep(7)
-    change_chassis("stable")
-    time.sleep(2)
-    change_chassis("y")
-    send_movement_command("left", 845)
-    time.sleep(7)
-    change_chassis("stable")
-    time.sleep(2)
-    change_chassis("x")
-    send_movement_command("backward", 2550)
-    time.sleep(12)
-    change_chassis("y")
-    send_movement_command("right", 1688)
-    time.sleep(9)
-    change_chassis("x")
-    send_movement_command("backward", 640)
-    time.sleep(6)
-    change_chassis("stable")
-    time.sleep(2)
-    change_chassis("x")
-    send_movement_command("forward", 652)
-    time.sleep(6)
-    change_chassis("stable")
-    time.sleep(2)
-    change_chassis("x")
-    send_movement_command("backward", 652)
-    time.sleep(6)
-    change_chassis("stable")
+    send_nano_command("release")
+    
+
+    
+# def delivery_logic():
+#     # Execute delivery steps
+#     time.sleep(5)
+#     change_chassis("x")
+#     send_movement_command("forward", 652)
+#     time.sleep(6)
+#     change_chassis("y")
+#     send_movement_command("left", 1677)
+#     time.sleep(9)
+#     change_chassis("x")
+#     send_movement_command("forward", 2545)
+#     time.sleep(12)
+#     change_chassis("stable")
+#     time.sleep(2)
+#     change_chassis("y")
+#     send_movement_command("right", 847)
+#     time.sleep(7)
+#     change_chassis("stable")
+#     time.sleep(2)
+#     change_chassis("y")
+#     send_movement_command("left", 845)
+#     time.sleep(7)
+#     change_chassis("stable")
+#     time.sleep(2)
+#     change_chassis("x")
+#     send_movement_command("backward", 2550)
+#     time.sleep(12)
+#     change_chassis("y")
+#     send_movement_command("right", 1688)
+#     time.sleep(9)
+#     change_chassis("x")
+#     send_movement_command("backward", 640)
+#     time.sleep(6)
+#     change_chassis("stable")
+#     time.sleep(2)
+#     change_chassis("x")
+#     send_movement_command("forward", 652)
+#     time.sleep(6)
+#     change_chassis("stable")
+#     time.sleep(2)
+#     change_chassis("x")
+#     send_movement_command("backward", 652)
+#     time.sleep(6)
+#     change_chassis("stable")
 
 
 
