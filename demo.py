@@ -9,9 +9,9 @@ TIMEOUT = 1
 
 try:
     esp32_serial = serial.Serial(ESP32_PORT, BAUD_RATE_ESP, timeout=TIMEOUT)
-    nano_serial = serial.Serial(ARDUINO_PORT, BAUD_RATE_NANO, timeout=TIMEOUT)
+    # nano_serial = serial.Serial(ARDUINO_PORT, BAUD_RATE_NANO, timeout=TIMEOUT)
     print(f"Connected to ESP32 on {ESP32_PORT}")
-    print(f"Connected to NANO on {ARDUINO_PORT}")
+    # print(f"Connected to NANO on {ARDUINO_PORT}")
 except Exception as e:
     print(f"Error initializing serial port: {e}")
     exit()
@@ -37,15 +37,15 @@ def initialize_positions():
     
     return current_pos_x, current_pos_y, current_pos_z
         
-def send_nano_command(command):
-    try:
-        if nano_serial.is_open:
-            nano_serial.write((command + '\n').encode('utf-8'))
-            print(f"Sent command to Nano: {command}")
-        else:
-            print("Nano serial port is not open.")
-    except Exception as e:
-        print(f"Error sending command to Nano: {e}")
+# def send_nano_command(command):
+#     try:
+#         if nano_serial.is_open:
+#             nano_serial.write((command + '\n').encode('utf-8'))
+#             print(f"Sent command to Nano: {command}")
+#         else:
+#             print("Nano serial port is not open.")
+#     except Exception as e:
+#         print(f"Error sending command to Nano: {e}")
         
 # Function to send a movement command
 def send_movement_command(direction, distance):
