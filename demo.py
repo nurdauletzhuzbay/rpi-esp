@@ -1,5 +1,6 @@
 import serial
 import time
+from flask import Flask, request
 
 ESP32_PORT = '/dev/ttyUSB0'
 ARDUINO_PORT = '/dev/ttyUSB1'
@@ -20,6 +21,7 @@ current_pos_x = 0.0
 current_pos_y = 0.0
 current_pos_z = 0.0
     
+app = Flask(__name__)
 
 def initialize_positions():
     global current_pos_x, current_pos_y, current_pos_z
@@ -136,104 +138,124 @@ def parse_esp32_data(response):
     return None
 
 
+# def return_logic():
+#     send_movement_command("down", 1.22)
+#     time.sleep(7)
+#     send_nano_command("release")
+#     time.sleep(9)
+#     send_nano_command("grasp")
+#     send_movement_command("up", 1.22)
+#     time.sleep(16)
+#     change_chassis("x")
+#     send_movement_command("forward", 652)
+#     time.sleep(6)
+#     change_chassis("stable")
+#     send_movement_command("down", 1.75)
+#     time.sleep(20)
+#     send_nano_command("release")
+#     send_movement_command("up", 1.75)
+#     time.sleep(4)
+#     send_nano_command("grasp")
+#     time.sleep(16)
+#     change_chassis("x")
+#     send_movement_command("backward", 652)
+#     time.sleep(6)
+#     change_chassis("stable")
+ 
 def return_logic():
-    send_movement_command("down", 1.22)
-    time.sleep(7)
-    send_nano_command("release")
-    time.sleep(9)
-    send_nano_command("grasp")
-    send_movement_command("up", 1.22)
-    time.sleep(16)
-    change_chassis("x")
-    send_movement_command("forward", 652)
-    time.sleep(6)
-    change_chassis("stable")
-    send_movement_command("down", 1.75)
-    time.sleep(20)
-    send_nano_command("release")
-    send_movement_command("up", 1.75)
-    time.sleep(4)
-    send_nano_command("grasp")
-    time.sleep(16)
-    change_chassis("x")
-    send_movement_command("backward", 652)
-    time.sleep(6)
     change_chassis("stable")
     
 def delivery_logic():
     # Execute delivery steps
     # time.sleep(5)
     change_chassis("x")
-    send_movement_command("forward", 652)
-    time.sleep(6)
-    change_chassis("y")
-    send_movement_command("left", 1677)
-    time.sleep(9)
-    change_chassis("x")
-    send_movement_command("forward", 2545)
-    time.sleep(12)
-    change_chassis("stable")
-    send_movement_command("down", 1.35)
-    time.sleep(7)
-    send_nano_command("release")
-    time.sleep(10)
-    send_nano_command("grasp")
-    send_movement_command("up", 1.35)
-    time.sleep(17)
-    change_chassis("y")
-    send_movement_command("right", 847)
-    time.sleep(7)
-    change_chassis("stable")
-    send_movement_command("down", 1.75)
-    time.sleep(21)
-    send_nano_command("release")
-    send_movement_command("up", 1.75)
-    time.sleep(4)
-    send_nano_command("grasp")
-    time.sleep(17)
-    change_chassis("y")
-    send_movement_command("left", 845)
-    time.sleep(7)
-    change_chassis("stable")
-    send_movement_command("down", 1.75)
-    time.sleep(7)
-    send_nano_command("release")
-    time.sleep(14)
-    send_nano_command("grasp")
-    send_movement_command("up", 1.75)
-    time.sleep(21)
-    change_chassis("x")
-    send_movement_command("backward", 2550)
-    time.sleep(12)
-    change_chassis("y")
-    send_movement_command("right", 1688)
-    time.sleep(9)
-    change_chassis("x")
-    send_movement_command("backward", 640)
-    time.sleep(6)
-    change_chassis("stable")
-    send_movement_command("down", 1.22)
-    time.sleep(16)
-    send_nano_command("release")
-    send_movement_command("up", 1.22)
-    time.sleep(4)
-    send_nano_command("grasp")
+    
+       
+# def delivery_logic():
+#     # Execute delivery steps
+#     # time.sleep(5)
+#     change_chassis("x")
+#     send_movement_command("forward", 652)
+#     time.sleep(6)
+#     change_chassis("y")
+#     send_movement_command("left", 1677)
+#     time.sleep(9)
+#     change_chassis("x")
+#     send_movement_command("forward", 2545)
+#     time.sleep(12)
+#     change_chassis("stable")
+#     send_movement_command("down", 1.35)
+#     time.sleep(7)
+#     send_nano_command("release")
+#     time.sleep(10)
+#     send_nano_command("grasp")
+#     send_movement_command("up", 1.35)
+#     time.sleep(17)
+#     change_chassis("y")
+#     send_movement_command("right", 847)
+#     time.sleep(7)
+#     change_chassis("stable")
+#     send_movement_command("down", 1.75)
+#     time.sleep(21)
+#     send_nano_command("release")
+#     send_movement_command("up", 1.75)
+#     time.sleep(4)
+#     send_nano_command("grasp")
+#     time.sleep(17)
+#     change_chassis("y")
+#     send_movement_command("left", 845)
+#     time.sleep(7)
+#     change_chassis("stable")
+#     send_movement_command("down", 1.75)
+#     time.sleep(7)
+#     send_nano_command("release")
+#     time.sleep(14)
+#     send_nano_command("grasp")
+#     send_movement_command("up", 1.75)
+#     time.sleep(21)
+#     change_chassis("x")
+#     send_movement_command("backward", 2550)
+#     time.sleep(12)
+#     change_chassis("y")
+#     send_movement_command("right", 1688)
+#     time.sleep(9)
+#     change_chassis("x")
+#     send_movement_command("backward", 640)
+#     time.sleep(6)
+#     change_chassis("stable")
+#     send_movement_command("down", 1.22)
+#     time.sleep(16)
+#     send_nano_command("release")
+#     send_movement_command("up", 1.22)
+#     time.sleep(4)
+#     send_nano_command("grasp")
 
 
+@app.route('/execute', methods=['POST'])
+def execute_logic():
+    data = request.get_json()
+    command = data['command']
+
+    if command == 'delivery':
+        print("Executing delivery logic...")
+        delivery_logic()
+    elif command == 'return':
+        print("Executing return logic...")
+        return_logic()
 
 
 if __name__ == "__main__":
     current_pos_x = 0.0
     current_pos_y = 0.0
     current_pos_z = 0.0
-    stopped_by_sensor = 0
     initialize_positions()
-    print("Press Enter to execute delivery logic...")
-    while True:
-        user_input = input("\nPress Enter to start or type 'exit' to quit: ")
-        if user_input.strip().lower() == 'exit':
-            print("Exiting program.")
-            break
-        elif user_input.strip() == '':
-            delivery_logic()
-            print("Delivery logic executed successfully.")
+    app.run(host='0.0.0.0', port=5000)
+    # print("Press Enter to execute delivery logic...")
+    # while True:
+    #     user_input = input("\nPress Enter to start or type 'exit' to quit: ")
+    #     if user_input.strip().lower() == 'exit':
+    #         print("Exiting program.")
+    #         break
+    #     elif user_input.strip() == '':
+    #         delivery_logic()
+    #         print("Delivery logic executed successfully.")
