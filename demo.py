@@ -226,12 +226,13 @@ def delivery_logic():
 def delivery_flask():
         print("Executing delivery logic...")
         delivery_logic()
+        return 0
 
 @app.route('/return', methods=['GET'])
 def return_flask():
         print("Executing return logic...")
         return_logic()
-
+        return 0
            
 if __name__ == "__main__":
     current_pos_x = 0.0
