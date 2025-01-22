@@ -270,15 +270,25 @@ def second_return():
     
     
     
-@app.route('/delivery', methods=['GET'])
+@app.route('/del1', methods=['GET'])
 def delivery_flask():
         print("Executing delivery logic...")
         delivery_logic()
 
-@app.route('/return', methods=['GET'])
+@app.route('/ret1', methods=['GET'])
 def return_flask():
         print("Executing return logic...")
         return_logic()
+
+@app.route('/del2', methods=['GET'])
+def delivery_flask_2():
+        print("Executing delivery logic...")
+        second_delivery()
+
+@app.route('/ret2', methods=['GET'])
+def return_flask_2():
+        print("Executing return logic...")
+        second_return()
            
 if __name__ == "__main__":
     current_pos_x = 0.0
