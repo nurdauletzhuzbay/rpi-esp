@@ -11,9 +11,9 @@ TIMEOUT = 1
 
 try:
     esp32_serial = serial.Serial(ESP32_PORT, BAUD_RATE_ESP, timeout=TIMEOUT)
-    # nano_serial = serial.Serial(ARDUINO_PORT, BAUD_RATE_NANO, timeout=TIMEOUT)
+    nano_serial = serial.Serial(ARDUINO_PORT, BAUD_RATE_NANO, timeout=TIMEOUT)
     print(f"Connected to ESP32 on {ESP32_PORT}")
-    # print(f"Connected to NANO on {ARDUINO_PORT}")
+    print(f"Connected to NANO on {ARDUINO_PORT}")
 except Exception as e:
     print(f"Error initializing serial port: {e}")
     exit()
@@ -49,15 +49,15 @@ def initialize_positions():
 #     except:
 #         print("exiting update loop")
         
-# def send_nano_command(command):
-#     try:
-#         if nano_serial.is_open:
-#             nano_serial.write((command + '\n').encode('utf-8'))
-#             print(f"Sent command to Nano: {command}")
-#         else:
-#             print("Nano serial port is not open.")
-#     except Exception as e:
-#         print(f"Error sending command to Nano: {e}")
+def send_nano_command(command):
+    try:
+        if nano_serial.is_open:
+            nano_serial.write((command + '\n').encode('utf-8'))
+            print(f"Sent command to Nano: {command}")
+        else:
+            print("Nano serial port is not open.")
+    except Exception as e:
+        print(f"Error sending command to Nano: {e}")
         
 # Function to send a movement command
 def send_movement_command(direction, distance):
@@ -239,8 +239,8 @@ def interactive_control():
                 else:
                     print("Invalid format. Use: chassis <mode>")
 
-            # elif command in ["grasp", "release", "fix", "unfix"]:
-            #     send_nano_command(command)
+            elif command in ["grasp", "release", "fix", "unfix"]:
+                send_nano_command(command)
 
             elif command == "exit":
                 print("Exiting program...")
@@ -254,7 +254,7 @@ def interactive_control():
         print("\nExiting program...")
     finally:
         esp32_serial.close()
-        # nano_serial.close()
+        nano_serial.close()
         is_running=False
         print("Serial ports closed.")
 
