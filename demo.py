@@ -231,19 +231,28 @@ def delivery_logic():
 #     send_nano_command("grasp")
 
 
-@app.route('/execute', methods=['POST'])
-def execute_logic():
-    data = request.get_json()
-    command = data['command']
+# @app.route('/execute', methods=['POST'])
+# def execute_logic():
+#     data = request.get_json()
+#     command = data['command']
 
-    if command == 'delivery':
+#     if command == 'delivery':
+#         print("Executing delivery logic...")
+#         delivery_logic()
+#     elif command == 'return':
+#         print("Executing return logic...")
+#         return_logic()
+
+@app.route('/delivery', methods=['GET'])
+def execute_logic():
         print("Executing delivery logic...")
         delivery_logic()
-    elif command == 'return':
+
+@app.route('/return', methods=['GET'])
+def execute_logic():
         print("Executing return logic...")
         return_logic()
-
-
+           
 if __name__ == "__main__":
     current_pos_x = 0.0
     current_pos_y = 0.0
