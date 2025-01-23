@@ -164,7 +164,7 @@ def return_logic():
     db.update_robot_status("IDLE")
 
  
-def delivery_logic(order_id,sku_id):
+def delivery_logic(order_id):
     # Execute delivery steps
     # time.sleep(5)
     db.update_order_status_by_id(order_id,"IN_PROCESS")
@@ -228,7 +228,7 @@ def delivery_logic(order_id,sku_id):
     time.sleep(4)
     send_nano_command("grasp")
     db.update_robot_status("IDLE")
-    db.set_sku_in_order_status_by_id(sku_id, "DELIVERED")
+    db.set_sku_in_order_status_by_id(order_id, "DELIVERED")
     db.update_order_status_by_id(order_id, "ALL_SET")
 
     
@@ -237,9 +237,9 @@ def delivery_logic(order_id,sku_id):
     
     
 @app.route('/delivery', methods=['GET'])
-def delivery_flask(order_id,sku_id):
+def delivery_flask(order_id):
         print("Executing delivery logic...")
-        delivery_logic(order_id,sku_id)
+        delivery_logic(order_id)
         return 0
 
 @app.route('/return', methods=['GET'])

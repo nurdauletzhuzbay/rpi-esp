@@ -32,12 +32,10 @@ class DbController:
         the_order = {'state': status}
         self.__ecom.orders.update_one({'_id': order_id}, {"$set": the_order})
 
-    def set_sku_in_order_status_by_id(self, order_id, sku, status):
+    def set_sku_in_order_status_by_id(self, order_id, status):
         order = self.__ecom.orders.find_one({'_id': order_id})
         for item in order['item_list']:
-            if item['sku_id'] == sku:
-                item['status'] = status
-                break
+            item['status'] = status
         self.__ecom.orders.update_one({'_id': order_id}, {"$set": order})
 
     def update_robot_status(self, status):
