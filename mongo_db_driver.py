@@ -29,7 +29,7 @@ class DbController:
 
 
     def update_order_status_by_id(self, order_id, status):
-        the_order = {'state': status}
+        the_order = {'status': status}
         self.__ecom.orders.update_one({'_id': order_id}, {"$set": the_order})
 
     def set_sku_in_order_status_by_id(self, order_id, status):
