@@ -140,7 +140,8 @@ def parse_esp32_data(response):
     return None
 
 
-def return_logic():
+def return_logic(order_id):
+    db.archivate_order(order_id)
     send_movement_command("down", 1.22)
     time.sleep(7)
     db.update_robot_status("TAKING_THE_BOX")
@@ -231,6 +232,7 @@ def delivery_logic(order_id):
     db.set_sku_in_order_status_by_id(order_id, "DELIVERED")
     db.update_order_status_by_id(order_id, "ALL_SET")
 
+
     
     
     
@@ -246,7 +248,8 @@ def delivery_flask():
 @app.route('/return', methods=['GET'])
 def return_flask():
         print("Executing return logic...")
-        return_logic()
+        order_id = request.args.get('order_id')
+        return_logic(order_id)
         return "Success"
            
 if __name__ == "__main__":

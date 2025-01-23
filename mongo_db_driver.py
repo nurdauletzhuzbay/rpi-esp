@@ -41,3 +41,9 @@ class DbController:
     def update_robot_status(self, status):
         the_robot = {'status': status}
         self.__ecom.robots.update_one({'robot_id': "1"}, {"$set": the_robot})
+
+    def archivate_order(self, order_id):
+        order = self.__ecom.orders.find_one({"_id": order_id})
+        response = self.__ecom.orders.insert_one(order)
+        if response:
+            self.__ecom.orders.delete_one({"_id": order["_id"]})
