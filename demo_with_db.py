@@ -237,16 +237,17 @@ def delivery_logic(order_id):
     
     
 @app.route('/delivery', methods=['GET'])
-def delivery_flask(order_id):
+def delivery_flask():
         print("Executing delivery logic...")
+        order_id = request.args.get('order_id')
         delivery_logic(order_id)
-        return 0
+        return "Success"
 
 @app.route('/return', methods=['GET'])
 def return_flask():
         print("Executing return logic...")
         return_logic()
-        return 0
+        return "Success"
            
 if __name__ == "__main__":
     current_pos_x = 0.0
