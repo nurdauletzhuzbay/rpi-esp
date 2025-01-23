@@ -227,6 +227,7 @@ def delivery_logic(order_id):
     send_movement_command("up", 1.22)
     time.sleep(4)
     send_nano_command("grasp")
+    time.sleep(12)
     db.update_robot_status("IDLE")
     db.set_sku_in_order_status_by_id(order_id, "DELIVERED")
     db.update_order_status_by_id(order_id, "ALL_SET")
