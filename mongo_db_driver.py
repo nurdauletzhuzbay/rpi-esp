@@ -29,7 +29,7 @@ class DbController:
 
 
     def update_order_status_by_id(self, order_id, status):
-        the_order = {'state': status}
+        the_order = {'status': status}
         self.__ecom.orders.update_one({'_id': order_id}, {"$set": the_order})
 
     def set_sku_in_order_status_by_id(self, order_id, status):
@@ -41,3 +41,9 @@ class DbController:
     def update_robot_status(self, status):
         the_robot = {'status': status}
         self.__ecom.robots.update_one({'robot_id': "1"}, {"$set": the_robot})
+
+    def archivate_order(self, order_id):
+        order = self.__ecom.orders.find_one({"_id": order_id})
+        response = self.__ecom.orders.insert_one(order)
+        if response:
+            self.__ecom.orders.delete_one({"_id": order["_id"]})
